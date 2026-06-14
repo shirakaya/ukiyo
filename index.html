@@ -264,14 +264,14 @@
         { sender: "J-0108 (私人信道)", subject: "拂晓的应答", body: "我在此境中看见了您的倒影。\n如果您读到这封邮件，请尽快回复我的邮件，我将短暂获得您的通讯方式。\n此处时空裂隙已经微张。但是不必惊慌，我会保护您。" },
         { sender: "未显示发件人", subject: "……你看见了什么？", body: "这张邮件没有落款。\n只有一行模糊的字：\n「门后是我，还是另一个你？」" }
     ];
-    const allImages = ["bg_1.png", "bg_2.png", "bg_3.png", "bg_4.png"];
+    const allImages = ["assets/images/bg_1.png", "assets/images/bg_2.png", "assets/images/bg_3.png", "assets/images/bg_4.png"];
     const playlist = [
         { name: "祈り", lyrics: ["出会いと別れを", "繰り返す日々の中で", "一体全体何を信じればいい"] },
         { name: "君の", lyrics: ["いっそ君が壊れて姿を変えて", "モンスターにでもなればいい"] },
         { name: "夢", lyrics: ["まるでこの世界で二人だけみたいだね", "なんて少しだけ夢をみてしまっただけ"] }
     ];
     const LYRICS_DURATION = 4000;
-    const cameraImages = ['bg_1.png', 'bg_3.png'];
+    const cameraImages = ['assets/images/bg_1.png', 'assets/images/bg_3.png'];
     const FILE_CONTENT = `为什么无论多重的伤势，只要不碎刀都能恢复？
 ——就像游戏存档。
 只需要回档就好。
@@ -279,8 +279,8 @@
 就算什么也留不下，就算什么都不记得，所有一切都归于纯白。`;
     const MONOLOGUE_CORRECT = "这是关于某个人未曾抵达的未来，未曾兑现的诺言，未曾言明的遗憾。";
     const MONOLOGUE_GARBLED = "猢狲ň棑揵憡䐈㨓䑅䍒㍏㜮㐸ⴰ㠵㈭㐴䐰㌭㠸䙅ⴰ㈴㐲ⴱ䈹㑃ⴸ䙁㘸ⴰ㜳㘴䈹㌹䀷";
-    const HEALTH_REPORT_PNG = "report_1.png";
-    const PLACEHOLDER_PNG = 'https://via.placeholder.com/710x1790.png?text=NSC-2225-REP-0108';
+    const HEALTH_REPORT_PNG = "assets/images/report_1.png";
+    const PLACEHOLDER_PNG = 'assets/images/report_2.png';
 
     const j0108FailureReplies = [
         { jp: "ここは時空が乱れているため、通信に大きな影響が出ます。", cn: "此处时空紊乱，通讯会受到较大影响。" },
@@ -318,7 +318,7 @@
     let mailReadStatus = new Array(BASE_MAIL_DATA.length).fill(false);
     let sentMails = [];
     let isInMailDetail = false;
-    let currentContact = 'juzumaru'; // 当前联系人，默认 J-0108
+    let currentContact = 'juzumaru';
     let currentTrack = 0;
     let isPlaying = false;
     let currentLyricIndex = 0;
@@ -388,15 +388,13 @@
         }
     }
     function unlockBg4() {
-        if (!state.bg4Unlocked && !state.availableImages.includes('bg_4.png')) {
+        if (!state.bg4Unlocked && !state.availableImages.includes('assets/images/bg_4.png')) {
             state.bg4Unlocked = true;
-            state.availableImages.push('bg_4.png');
+            state.availableImages.push('assets/images/bg_4.png');
             saveAll();
         }
     }
-    function getChatHistoryKey() {
-        return `chat_history_${currentContact}`;
-    }
+    function getChatHistoryKey() { return `chat_history_${currentContact}`; }
     function saveChatMessage(msg) {
         let history = JSON.parse(localStorage.getItem(getChatHistoryKey()) || '[]');
         history.push(msg);
@@ -484,7 +482,7 @@
 
     function proceedAfterLocationChoice(agreed) {
         if (agreed) {
-            const imgUrl = 'bg_2.png';
+            const imgUrl = 'assets/images/bg_2.png';
             if (!state.availableImages.includes(imgUrl)) state.availableImages.push(imgUrl);
             const imgDiv = document.createElement('div'); imgDiv.className = 'message sent'; imgDiv.style.transform = 'rotate(3deg)';
             imgDiv.innerHTML = `<div class="polaroid"><img src="${imgUrl}" style="max-width:160px;max-height:200px;"></div>`;
@@ -511,7 +509,7 @@
                 state.timeJumpHintPending = true; saveAll();
             }, 60000);
         } else {
-            if (!state.availableImages.includes('bg_2.png')) state.availableImages.push('bg_2.png');
+            if (!state.availableImages.includes('assets/images/bg_2.png')) state.availableImages.push('assets/images/bg_2.png');
             const delayedMessages = [
                 { jp: "大丈夫です。私を信頼されないのは当然のことです。", cn: "没关系。您不信任我是理所当然的。" },
                 { jp: "通信の中で、安全な場所への行き方をできるだけお伝えします。", cn: "我会在通讯中尽量提示您如何前往安全的地方。" },
@@ -643,14 +641,14 @@
         const html = `<div class="message sent" style="transform:rotate(5deg);"><div class="polaroid"><img src="${imgUrl}" style="max-width:160px;max-height:200px;"></div></div>`;
         document.getElementById('chatMessages').insertAdjacentHTML('beforeend', html);
         saveChatMessage({ type: 'sent', isImage: true, url: imgUrl });
-        if (imgUrl === 'bg_1.png') { state.cond6 = true; addJ0108Message({ jp: "環境から判断するに、天守閣の近くですか？", cn: "根据环境判断，是在天守阁附近吗？" }); }
-        else if (imgUrl === 'bg_2.png') state.cond8 = true;
-        else if (imgUrl === 'bg_3.png') {
+        if (imgUrl === 'assets/images/bg_1.png') { state.cond6 = true; addJ0108Message({ jp: "環境から判断するに、天守閣の近くですか？", cn: "根据环境判断，是在天守阁附近吗？" }); }
+        else if (imgUrl === 'assets/images/bg_2.png') state.cond8 = true;
+        else if (imgUrl === 'assets/images/bg_3.png') {
             state.cond9 = true;
             addJ0108Message({ jp: "……これはあなたですか？", cn: ".....这是您吗？" });
             addJ0108Message({ jp: "いえ、なんでもありません。", cn: "不，没什么。" });
             addJ0108Message({ jp: "あなたの写真は、私に送らないほうがいいです。", cn: "您的照片，还是不要发送给我比较好。" });
-        } else if (imgUrl === 'bg_4.png') state.cond10 = true;
+        } else if (imgUrl === 'assets/images/bg_4.png') state.cond10 = true;
         handleUserInteraction();
         saveAll();
     }
@@ -970,7 +968,7 @@
             }
             html += `<div class="message-list-item" data-contact-id="juzumaru">
                 <div style="display:flex; align-items:center; gap:12px; width:100%;">
-                    <img src="https://files.catbox.moe/cxm2gd.jpg" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                    <img src="assets/images/J-0108.png" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
                     <div style="flex:1;">
                         <div style="display:flex; justify-content:space-between;"><strong class="message-list-name">J-0108</strong><span class="message-list-time">${time}</span></div>
                         <div style="display:flex; justify-content:space-between; align-items:center;"><span class="message-list-preview">${escapeHtml(preview)}</span></div>
@@ -1034,7 +1032,6 @@
         else if (id==='chat') {
             document.getElementById('chatScreen').style.display='flex';
             updateChatTitle();
-            // 如果是加州清光且无历史，插入预设消息
             if (currentContact === 'kashuu') {
                 const history = JSON.parse(localStorage.getItem(getChatHistoryKey()) || '[]');
                 if (history.length === 0) {
