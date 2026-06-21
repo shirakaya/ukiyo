@@ -174,8 +174,8 @@
         #mapWrapper.smooth { transition: transform 0.3s cubic-bezier(0.22,1,0.36,1); }
 
         #endingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 20000; display: flex; flex-direction: column; font-family: "Microsoft YaHei", "Hiragino Sans", "Meiryo", "SimHei", "Heiti SC", sans-serif; color: #fff; }
-        .ending-image-section { flex: 0 0 auto; text-align: center; padding: 25px 20px 15px; background: #000; }
-        .ending-image-section img { max-width: 100%; max-height: 32vh; object-fit: contain; display: block; margin: 0 auto; filter: grayscale(100%) contrast(1.1) brightness(0.9); }
+        .ending-image-section { flex: 0 0 auto; text-align: center; padding: 100px 20px 15px; background: #000; }
+        .ending-image-section img { max-width: 100%; max-height: 32vh; object-fit: contain; display: block; margin: 0 auto; }
         .ending-fixed-title { flex: 0 0 auto; text-align: center; padding: 20px 0; background: #000; z-index: 10; }
         .ending-fixed-title h1 { font-size: 48px; font-weight: bold; margin: 0; letter-spacing: 14px; color: #fff; }
         .ending-fixed-title .subtitle { font-size: 16px; margin-top: 10px; color: #bbb; font-family: "Times New Roman", "Georgia", serif; letter-spacing: 2px; text-transform: lowercase; }
@@ -270,7 +270,7 @@
 (function() {
     const BASE_MAIL_DATA = [
         { sender: "时之政府监督委员会", subject: "关于时空观测基准的修正通知", body: "据最新时空波动观测数据，██████号本丸于2216年11月13日的观测记录中出现异常时空波动，与历史基准存在3%偏移。\n\n该偏移目前仍在可控阈值内，但为防止本丸坐标漂移导致通讯链路失稳，请自收到本通知之日起，尽快校准您的终端时间基准，以免后续与时政通讯产生时序违和。" },
-        { sender: "时之政府特别调查科", subject: "关于‘失踪检察官’问询函", body: "据最近一期监察报告，编号J-0108的检察官于前往██████号本丸执行例行巡查后，与特别调查科失去联络，断联时长已逾240小时。\n\n若您在本丸内或周边时空发现任何与此相关的异常迹象、通讯残留或行踪线索，请依最高优先级立即上报，切勿延误。" },
+        { sender: "时之政府特别调查科", subject: "关于‘失踪监察官’问询函", body: "据最近一期监察报告，编号J-0108的监察官于前往██████号本丸执行例行巡查后，与特别调查科失去联络，断联时长已逾240小时。\n\n若您在本丸内或周边时空发现任何与此相关的异常迹象、通讯残留或行踪线索，请依最高优先级立即上报，切勿延误。" },
         { sender: "J-0108 (私人信道)", subject: "拂晓的应答", body: "我在此境中看见了您的倒影。\n如果您读到这封邮件，请尽快回复我的邮件，我将短暂获得您的通讯方式。\n此处时空裂隙已经微张。但是不必惊慌，我会保护您。" }
     ];
     const SOS_MAIL_1 = { sender: "时之政府救援协调部", subject: "关于救援请求的回复", body: "敬启者：\n\n尊敬的████阁下，时之政府已收到您发出的求救信号。\n\n尽管您目前已卸任审神者职务，但念及您过往对时之政府之贡献，经特批，我们将就近调遣检察官前往您所在时空坐标，实施紧急援助。\n\n在援护人员抵达之前，请务必确保自身安全，减少非必要行动。" };
@@ -516,7 +516,8 @@
             "重要的是你回到了属于你的地方"
         ] },
         "迷途": { image: "assets/images/mitu_end.jpg", title: "迷途", subtitle: "Sad End", audio: "assets/audio/mitu_bgm.mp3", texts: [
-            "\"众生迷途，不知出要。\"——《华严经》",
+            "众生迷途，不知出要",
+            "无明长夜，轮转不息",
             "你忘记了为什么启航",
             "你只是麻木的行走在时光中",
             "一如过往"
