@@ -82,7 +82,6 @@
         .backToHomeBtn { font-size:24px; background:none; border:none; cursor:pointer; margin-right:10px; color:#6b56a5; }
         .online-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-left: 8px; background-color: #ff3b30; }
         .online-dot.online { background-color: #4cd964; }
-        .clear-chat-btn { background: none; border: none; cursor: default; font-size: 20px; color: #4b3b6e; margin-left: 8px; opacity: 0.5; }
         .mail-list-item { padding:12px; border-bottom:1px solid rgba(0,0,0,0.05); cursor:pointer; background:rgba(255,255,255,0.3); backdrop-filter:blur(5px); border-radius:12px; margin-bottom:4px; }
         .mail-list-item.unread .mail-subject { font-weight: 700; color: #3a2a5a; }
         .mail-list-item.read .mail-subject { font-weight: 400; color: #b0a0c0; }
@@ -122,7 +121,6 @@
         .calendar-week-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 600; font-size: 13px; color: #6b5a8a; margin-bottom: 8px; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; }
         .calendar-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 15px; font-weight: 500; cursor: pointer; color: #4b3b6e; position: relative; }
-        .calendar-day.other-month { opacity: 0.3; }
         .calendar-day.active { background: rgba(138,118,197,0.3); color: white; }
         .calendar-day.has-event::after { content: ''; position: absolute; bottom: 3px; width: 4px; height: 4px; background: #ff6b6b; border-radius: 50%; }
         .calendar-footer { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.1); }
@@ -167,15 +165,14 @@
         .location-prompt-buttons { display: flex; gap: 12px; justify-content: center; }
         .location-prompt-btn { border: none; border-radius: 20px; padding: 8px 22px; font-size: 13px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.7); color: #4b3b6e; }
         .location-prompt-btn.yes { background: #c3b7f0; color: white; }
-        .dark-theme .location-prompt-message { background: rgba(30,30,30,0.8); border-color: rgba(255,255,255,0.2); color: #ccc; }
-        .dark-theme .location-prompt-text { color: #ddd; }
-        .dark-theme .location-prompt-btn { background: rgba(255,255,255,0.15); color: #ccc; }
-        .dark-theme .location-prompt-btn.yes { background: #8a76c5; color: white; }
+        .chat-input-hints { display: flex; gap: 8px; margin-bottom: 8px; overflow-x: auto; padding: 2px; min-height: 28px; }
+        .chat-hint-tag { background: rgba(0,0,0,0.6); color: #c3b7f0; border: 1px solid rgba(195,183,240,0.3); border-radius: 12px; padding: 4px 10px; font-size: 11px; cursor: pointer; white-space: nowrap; backdrop-filter: blur(4px); transition: all 0.2s; flex-shrink: 0; }
+        .chat-hint-tag:hover { background: rgba(195,183,240,0.3); color: #fff; }
+
         #mapContainer:active { cursor: grabbing; }
         #mapWrapper { transition: none; }
         #mapWrapper.smooth { transition: transform 0.3s cubic-bezier(0.22,1,0.36,1); }
 
-        /* 新版结局覆盖层 */
         #endingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 20000; display: flex; flex-direction: column; font-family: "Microsoft YaHei", "Hiragino Sans", "Meiryo", "SimHei", "Heiti SC", sans-serif; color: #fff; }
         .ending-image-section { flex: 0 0 auto; text-align: center; padding: 25px 20px 15px; background: #000; }
         .ending-image-section img { max-width: 100%; max-height: 32vh; object-fit: contain; display: block; margin: 0 auto; filter: grayscale(100%) contrast(1.1) brightness(0.9); }
@@ -193,6 +190,9 @@
             .ending-text-pair .jp { font-size: 16px; }
             .ending-text-pair .cn { font-size: 19px; }
         }
+    
+        .offline-banner { display: none; background: rgba(255,59,48,0.12); color: #ff3b30; text-align: center; padding: 6px; font-size: 12px; border-bottom: 1px solid rgba(255,59,48,0.2); backdrop-filter: blur(4px); }
+        .offline-banner.show { display: block; }
     </style>
 <base target="_blank">
 </head>
@@ -204,7 +204,7 @@
                 <span id="statusTime">12:00</span>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <div class="signal-bars" id="signalBars"><span class="signal-dot"></span><span class="signal-dot"></span><span class="signal-dot"></span><span class="signal-dot"></span></div>
-                    <div class="battery-container"><span id="batteryPercent">52%</span><div class="battery-body"><div class="battery-fill" id="batteryFill" style="width:52%;"></div></div><div class="battery-cap"></div></div>
+                    <div class="battery-container"><span id="batteryPercent">100%</span><div class="battery-body"><div class="battery-fill" id="batteryFill" style="width:100%;"></div></div><div class="battery-cap"></div></div>
                 </div>
             </div>
             <div class="clock-widget">
@@ -230,7 +230,8 @@
         </div>
 
         <div id="messageListScreen" class="fullscreen-view"><div class="view-header"><button class="backToHomeBtn">‹</button><div style="flex:1;"><strong>消息</strong></div></div><div class="view-content"><div class="message-list-container" id="messageListContainer"></div></div></div>
-        <div id="chatScreen" class="fullscreen-view"><div class="view-header"><button class="backToHomeBtn">‹</button><div style="flex:1;"><strong id="chatTitle">J-0108</strong><span id="onlineDot" class="online-dot online"></span></div><button id="clearChatMenuBtn" class="clear-chat-btn">…</button></div><div class="chat-messages" id="chatMessages"></div><div class="chat-input-area"><button id="selectPhotoBtn">+</button><input type="text" id="chatInput" placeholder=""><button id="sendTextBtn">➤</button></div></div>
+        <div id="chatScreen" class="fullscreen-view"><div class="view-header"><button class="backToHomeBtn">‹</button><div style="flex:1;"><strong id="chatTitle">J-0108</strong><span id="onlineDot" class="online-dot online"></span></div></div><div class="offline-banner" id="offlineBanner">对方当前处于离线状态，无法接收消息</div>
+        <div class="chat-messages" id="chatMessages"></div><div class="chat-input-area"><div id="chatInputHints" class="chat-input-hints"></div><button id="selectPhotoBtn">+</button><input type="text" id="chatInput" placeholder=""><button id="sendTextBtn">➤</button></div></div>
         <div id="mailScreen" class="fullscreen-view"><div class="view-header"><button id="mailBackBtn" class="backToHomeBtn">‹</button><div><strong>收件箱</strong></div></div><div class="view-content" id="mailContent"></div></div>
         <div id="albumScreen" class="fullscreen-view"><div class="view-header"><button class="backToHomeBtn">‹</button><div><strong>相册</strong></div></div><div class="view-content" id="albumContent"></div></div>
         <div id="memoScreen" class="fullscreen-view"><div class="view-header"><button class="backToHomeBtn">‹</button><div><strong>文件</strong></div></div><div class="view-content" id="memoContent"></div></div>
@@ -259,18 +260,41 @@
 <div class="toast" id="toast"></div>
 
 <script>
+    const STORAGE_KEYS = {
+        STATE: 'renge_final_state',
+        MAIL_READ: 'renge_final_mailRead',
+        CALENDAR: 'calendarEvents',
+        CHAT_PREFIX: 'chat_history_'
+    };
+
 (function() {
     const BASE_MAIL_DATA = [
-        { sender: "时之政府监督委员会", subject: "关于时空观测基准的修正通知", body: "据最新时空波动观测数据，██████号本丸于2214年1月18日的观测记录中出现异常时空波动，与历史基准存在3%偏移。\n\n该偏移目前仍在可控阈值内，但为防止本丸坐标漂移导致通讯链路失稳，请自收到本通知之日起，尽快校准您的终端时间基准，以免后续与时政通讯产生时序违和。" },
+        { sender: "时之政府监督委员会", subject: "关于时空观测基准的修正通知", body: "据最新时空波动观测数据，██████号本丸于2216年11月13日的观测记录中出现异常时空波动，与历史基准存在3%偏移。\n\n该偏移目前仍在可控阈值内，但为防止本丸坐标漂移导致通讯链路失稳，请自收到本通知之日起，尽快校准您的终端时间基准，以免后续与时政通讯产生时序违和。" },
         { sender: "时之政府特别调查科", subject: "关于‘失踪监察官’问询函", body: "据最近一期监察报告，编号J-0108的监察官于前往██████号本丸执行例行巡查后，与特别调查科失去联络，断联时长已逾240小时。\n\n若您在本丸内或周边时空发现任何与此相关的异常迹象、通讯残留或行踪线索，请依最高优先级立即上报，切勿延误。" },
         { sender: "J-0108 (私人信道)", subject: "拂晓的应答", body: "我在此境中看见了您的倒影。\n如果您读到这封邮件，请尽快回复我的邮件，我将短暂获得您的通讯方式。\n此处时空裂隙已经微张。但是不必惊慌，我会保护您。" }
     ];
     const SOS_MAIL_1 = { sender: "时之政府救援协调部", subject: "关于救援请求的回复", body: "敬启者：\n\n尊敬的████阁下，时之政府已收到您发出的求救信号。\n\n尽管您目前已卸任审神者职务，但念及您过往对时之政府之贡献，经特批，我们将就近调遣检察官前往您所在时空坐标，实施紧急援助。\n\n在援护人员抵达之前，请务必确保自身安全，减少非必要行动。" };
     const SOS_MAIL_2 = { sender: "时之政府救援协调部", subject: "关于救援派遣的更新通知", body: "敬启者：\n\n尊敬的████阁下，现就救援派遣事宜向您通报最新进展。\n\n因特殊状况，原定就近派遣之检察官目前无法成行。我们已紧急改派其他检察官前往您所在时空，并已顺利锚定您的坐标位置。\n\n请保持终端畅通，耐心等待。" };
-    const TIP_MAIL = { sender: "???", subject: "终端使用须知（？）", body: "这台设备的时间显示似乎不太稳定，在不同日期醒来时，窗外的风景也许会变——也可能不会，谁知道呢。\n\n相机是个好东西，但记得多换几个角度看看。有些东西第一眼看不清，第二眼……也不一定看得清。\n\n如果聊天对象已读不回，也许不是网不好。试着给他看点什么？人对视觉信息总是更敏感嘛。\n\n邮件箱会自己长出新邮件，像蘑菇一样。记得勤收信，但别什么信都回——有些收件人可能并不想收到你的回复。\n\n日历上的待办事项可以划掉，也可以写新的。不过……已经写上去的事情，真的划得掉吗？\n\n音乐播放器里的歌，听完可能会留下点什么。也可能什么都不留下。取决于你在哪一天按下播放键。\n\n电量会自己跑掉，像沙漏里的沙子。低电量时记得找充电器——虽然这里可能并没有插座。\n\n如果觉得自己在原地打转，试试：①把看到的东西分享出去 ②去没去过的时间逛逛 ③检查一下邮箱有没有漏读的信 ④对日程表做点手脚。总有一招管用。" };
+    const TIP_MAIL = { sender: "???", subject: "终端使用须知（？）", body: "这台设备的时间显示似乎不太稳定，在不同日期醒来时，窗外的风景也许会变——也可能不会，谁知道呢。\n\n相机是个好东西，但记得多换几个角度看看。有些东西第一眼看不清，第二眼……也不一定看得清。\n\n如果聊天对象已读不回，也许不是网不好。试着给他看点什么？人对视觉信息总是更敏感嘛。\n\n邮件箱会自己长出新邮件，像蘑菇一样。记得勤收信，但别什么信都回——有些收件人可能并不想收到你的回复。\n\n日历上的待办事项可以划掉，也可以写新的。不过……已经写上去的事情，真的划得掉吗？\n\n音乐播放器里的歌，听完可能会留下点什么。也可能什么都不留下。取决于你在哪一天按下播放键。\n\n电量会自己跑掉，像沙漏里的沙子。低电量时记得找充电器——虽然这里可能并没有插座。\n\n如果觉得自己在原地打转，试试：①把看到的东西分享出去 ②去没去过的时间逛逛 ③检查一下邮箱有没有漏读的信 ④对日程表做点手脚。总有一招管用。" };    const GUIDE_MAIL_1 = { sender: "???", subject: "抄作业是不对的", body: "怎么了怎么了？\n又发生了什么事情。\n你说终端使用须知写的太模糊了？\n这是解密游戏啊——怎么可以一开始就给答案。\n抄作业是不对的。\n请多在时空里游走一下吧，或许会有意外惊喜！\n\nTip：我是按照刀啃乱布的游戏内时间和游戏外游戏真实上线时间设计的（日服日服）！\n所以有些日期你看着眼熟的话……不要怀疑自己，相信你的直觉。\n\n比较关键的时间节点位于8周年，无论按游戏内还是游戏外时间。\n中间的一百多年只是因为设计日历只能这样连续......\n对的，跳转基本什么都不会发生。\n哦，设计时间的时候还参考了某个刃的相关信息（例如开放日，重要财什么的）。\n\n还有，不要一上来就给J-0108发SOS，那样很多路线会被关掉的！\n先和他好好聊聊天不好吗？\n如果遇见图片裂开了，不要问图图去哪了。它后面会出现的。\n原因是因为网页加载图片很慢，容易裂开。我已经尽量把单张图压到150k以内了，但是首次加载还是避免不了有这个问题，都怪github！\n\nP.S. 如果你已经死档了……设置里有初始化按钮，按一下就好了。\n求求你们不要再笑这个游戏了，为了能正常运行我用尽了一切手段......如果还有bug，不是特别严重的就重新开始嘛，求求你了" };
+    const GUIDE_MAIL_2 = { sender: "???", subject: "小抄（不要告诉别人）", body: "真是拿你没办法。既然你又来求救了。那我就写小抄给你。\n此系统没有阅后即焚的效果。\n所以如果看到了，记住了，就当这封信不存在好吗？\n求求你了，我磨了这么久才做出来的。\n被人速通了，我不白设计了嘛......\n\n━━━━━━━━━━━━━━━━━━━━━━\n【小抄·时间跳转篇】\n━━━━━━━━━━━━━━━━━━━━━━\n\n日历右上角那个⚙️按钮，点进去可以跳时间。\n年份低于2000会报错，不要试了，我没做内容（诚实）。\n\n几个关键日期记得去：\n• 2024-01-19 到 2026-11-03 之间 → 文件里会多出一篇日记\n• 2213-07-13 到 2214-01-18 之间 → 健康诊断书解锁\n• 2225-07-03 之后 → 有一份档案等着你\n• 2205-01-14 → 会多出一个聊天对象哦\n• 2023-01-05 → 有我的彩蛋（喂）\n\n还有，2214-01-18 这个日子很特殊。\n去文件里看看「独白」在那天是不是能正常显示了？\n\n━━━━━━━━━━━━━━━━━━━━━━\n【小抄·聊天篇】\n━━━━━━━━━━━━━━━━━━━━━━\n\n给J-0108发邮件就能解锁聊天，记得同意定位！\n不同意也能玩，但会少很多剧情，而且跳转20次以上会迷路……\n\n和他聊天时多发点东西：\n• 照片（去相机里拍，不同日期能拍到不一样的）\n• 文件（解锁后在文件应用里，点+号就能发）\n\n每发一个文件他都会说点什么，这些都是「收集要素」！\n要触发好结局的话，日记、诊断书、档案都要发给他看一遍。\n\n━━━━━━━━━━━━━━━━━━━━━━\n【小抄·关键词篇】\n━━━━━━━━━━━━━━━━━━━━━━\n\nJ-0108有26组关键词回复，多试试不同的词。\n但更重要的是——跳转时间超过5次之后，试着输入「数珠丸恒次」。\n对，就是他的真名。他会吓一跳的（笑）。\n\n━━━━━━━━━━━━━━━━━━━━━━\n【小抄·结局篇】\n━━━━━━━━━━━━━━━━━━━━━━\n\n8个结局，触发条件我懒得全写了，但给你几个提示：\n\n• 想要Happy End / True End：不要发SOS！不要发SOS！不要发SOS！\n  重要的事说三遍。发求救邮件会关闭很多路线。\n\n• 想要垂慈摄受（Good End）：\n  多发文件，多跳转，识破真名，同意定位，然后输入「我喜欢你」。\n  对，就是要这样！\n\n• 想要空花阳焰（Open End）：\n  这个很刁钻。你需要「读过所有文件」但「没发给他看过」。\n  也就是自己偷偷看完，然后发SOS求救，再输入「我该走了」。\n  ……对的对的，对吗？\n\n• 想要一莲托生（True End）：\n  全收集路线。所有文件反应都要触发，真名要识破，定位要同意，\n  虫干会的彩蛋要触发，失踪检察官邮件要读过，且不能发SOS。\n  然后随便输入什么，那个人会自己走向你。毕竟，他和你都等了太久太久了。\n\n• 电量归零会触发「如是观」，然后强制重启。\n  这不是坏结局，这是「你挂机太久被系统踢下线了」。\n\n━━━━━━━━━━━━━━━━━━━━━━\n\n好了，小抄给完了。\n求你当作没看到，慢慢玩，好吗？\n我写了那么多隐藏台词，你速通的话它们就永远沉睡了……\n\nP.S. 如果还是死档了，设置里有初始化。再死一次的话……\n那就再看一遍这封邮件吧，反正它不会消失的（苦笑）。\n\n——某个一边测bug一边祈祷不要速通的开发者" };
+
     const EASTER_EGG_MAIL = { sender: "未知", subject: "客串事件", body: "问过某刃的意见，让我加上这一段，纪念一下本人和他的相遇。\n2023年1月5日，本人在本丸第一次和名为数珠丸恒次的存在相遇。\n但其实根本不知道该说些什么。问他要不要我在这封信里写告白算了。\n他说不要，就此罢休。\n请把这当成单纯的彩蛋(｡- .•)\n有想过要不要按自己本丸的时间来设计路线。\n最后还是选择了讲诉一点幻想夜话。\n有些日期精心设计了，有些日期是随机乱打的，不必深究。\n如果有bug，请见谅。\n死档了，可以点击设置内的初始化可以重头来过。\n对，没有存档点……\n代码太复杂了，我的大纲一变再变已经约等于没有大纲了。\n希望不要有酒吧点炒饭事件，我真的不想修bug(Ｔ▽Ｔ)" };
 
-    const allImages = ["assets/images/picture_1.jpg", "assets/images/map_1.png", "assets/images/selfie.jpg", "assets/images/lotus.jpg"];
+    const CREDIT_MAIL = { sender: "系统", subject: "素材与版权说明", body: "本游戏使用的所有背景音乐（BGM）版权归属于「びじえもん」（BGMemon）。\n\n部分图片素材来源于 Pexels 免费图库，遵循其使用许可协议。\n\n感谢各位创作者提供的优质资源。" };
+
+    const MAIL_DATA_MAP = {
+        base_0: BASE_MAIL_DATA[0],
+        base_1: BASE_MAIL_DATA[1],
+        base_2: BASE_MAIL_DATA[2],
+        sos_1: SOS_MAIL_1,
+        sos_2: SOS_MAIL_2,
+        easter_egg: EASTER_EGG_MAIL,
+        tip: TIP_MAIL,
+        guide_1: GUIDE_MAIL_1,
+        guide_2: GUIDE_MAIL_2,
+        credit: CREDIT_MAIL
+    };
+
     const playlist = [
         { name: "祈り", lyrics: ["出会いと別れを", "繰り返す日々の中で", "一体全体何を信じればいい"] },
         { name: "君の", lyrics: ["いっそ君が壊れて姿を変えて", "モンスターにでもなればいい"] },
@@ -295,6 +319,21 @@
         { jp: "申し訳ございません、先ほどのメッセージは正常に表示できませんでした。", cn: "实在抱歉，刚刚发送的消息无法正常显示。" },
         { jp: "申し訳ございません。", cn: "抱歉。" }
     ];
+    const j0108RandomReplies = [
+        { jp: "申し訳ございません。先ほど、少し手間取っておりまして。", cn: "实在抱歉。刚刚遇到了一点麻烦，没能及时回复您。" },
+        { jp: "時空の乱れが強くなっております。通信が不安定でございます。", cn: "时空紊乱正在加剧。通讯变得不太稳定。" },
+        { jp: "あなた様の声は、確かに届いております。どうか、焦らずに。", cn: "您的声音确实传达到了。请不要着急。" },
+        { jp: "この端末、時々勝手に動くのですね。……いえ、私のせいではございません。", cn: "这台终端有时会自己动起来呢。……不，不是我的缘故。" },
+        { jp: "少し、目を離していた間に、時間がすっ飛んでおりました。", cn: "只是稍微移开视线的片刻，时间就已经飞逝而过了。" },
+        { jp: "あなた様のいる場所は、まだ特定できておりません。ですが、探しております。", cn: "您所在的位置，尚未能确定。但我正在寻找。" },
+        { jp: "申し訳ございません。先ほどのメッセージは、風に飛ばされてしまいましたかのように。", cn: "实在抱歉。刚刚那条消息，就像被风吹散了一样。" },
+        { jp: "時々、あなた様の輪郭がぼやけて見えるのです。……気のせいでしょうか。", cn: "有时，您的轮廓会模糊地映入眼帘。……是错觉吧。" },
+        { jp: "この通信路は、あなた様と私だけのものでございます。どうか、安心してください。", cn: "这条通讯线路，是您与我独有的。请安心。" },
+        { jp: "先ほどは、少し遠い過去の声が混じっておりました。……気になさらず。", cn: "刚才混入了些许遥远过去的声音。……请不要在意。" },
+        { jp: "あなた様が何をお考えであろうと、私はここにおります。", cn: "无论您在思考什么，我都在这里。" },
+        { jp: "時空の波に揺られて、少し眩暈がいたしました。もう大丈夫でございます。", cn: "被时空的波涛摇撼，略感眩晕。已经没事了。" },
+        { jp: "あなた様のメッセージを待っている間も、私の時間は動いております。", cn: "等待您消息的这段时间里，我的时间也在流逝。" }
+    ];
 
     const dateJumpReplies = [
         { jp: "私に何か、お力になれることはございましょうか。", cn: "我能为您做些什么呢？" },
@@ -318,13 +357,38 @@
         { jp: "私はあなた様の影を追いかけ、今日もこの時空を彷徨っております。", cn: "我追逐着您的身影，今日仍徘徊于此时空之中。" },
         { jp: "いつか必ず、あなた様に届く言葉を探し続けてまいります。", cn: "我会继续寻找，终有一日定能传达给您的话语。" }
     ];
+    const KASHUU_SEQ1 = [
+        { jp: "あるじは嘘つきです。", cn: "主人是骗子。" },
+        { jp: "……実は、とっくに知っておりました。あなたの霊力が崩壊していること。", cn: "……其实我早就知道了。关于您灵力溃散的事情。" },
+        { jp: "ずっと、みんなに隠しておいででしたよね。", cn: "您一直在瞒着大家吧。" },
+        { jp: "このままお別れになれば、もう二度と帰ってこられないのだと思います。でも、あの日、私は何も言えませんでした。", cn: "我想您此行离开后再也不会回来了。但是，那一天我还是什么都没说。" }
+    ];
+    const KASHUU_SEQ2 = [
+        { jp: "あの人、もうこの本丸にはおりません。あるじが何かしたのでしょう？", cn: "那个人，不在这所本丸了。您做了些什么吧？" },
+        { jp: "いえ、責めているわけではありません。", cn: "不，我不是想指责你。" },
+        { jp: "こういうことの善し悪しを、私が決めるべきではないのでしょう。", cn: "这些事情的好与坏不该由我来界定。" },
+        { jp: "ただ、数珠丸さんが少し……可哀想だと思っただけです。", cn: "只是觉得，数珠丸先生太可怜了一点......" }
+    ];
+    const KASHUU_SEQ3 = [
+        { jp: "あるじ、本丸が解散されることになりました。", cn: "主人，本丸要被解散了。" },
+        { jp: "私は別の本丸に配属されることになりました。聞けば、そちらの審神者も優しい方だとか……", cn: "我被分配去了另一座本丸，听说那边的审神者也很温柔……" },
+        { jp: "それでも、あなたを待ち続けたいのです。この身が錆びつくまで、記憶が曇るまで。", cn: "但我还是想等你，等到这具身体生锈也好，等到记忆模糊也好。" },
+        { jp: "あ、文句を言っているわけではありませんよ！", cn: "啊，我不是在抱怨啦！" },
+        { jp: "ただ、少し……少しだけ、あなたに会いたくなっただけです。", cn: "只是稍微……稍微有点想你了。" }
+    ];
 
     let state = {
-        cond1: false, cond2: false, cond3: false, cond4: false, cond5: false,
-        cond6: false, cond7: false, cond8: false, cond9: false, cond10: false,
-        cond11: false, cond12: false, cond13: false,
+        j0108Offline: false,
+        readDiary: false, readHealthReport: false, readMonologue: false,
         gongfanSequenceTriggered: false,
         huzhongSequenceTriggered: false,
+        kashuuSequence1Triggered: false,
+        kashuuSequence2Triggered: false,
+        kashuuSequence3Triggered: false,
+        kashuuLastTriggerDate: null,
+        picture1Taken: false,
+        picture2Taken: false,
+        cameraFlipped: false,
         availableImages: [],
         musicPlayedFlags: [false,false,false],
         specialMailShown: false,
@@ -338,7 +402,6 @@
         timeJumpHintTriggered: false,
         aboutThatDayShown: false,
         healthReportShown: false,
-        bg4Unlocked: false,
         restartCount: 0,
         dateJumpCount: 0,
         endingTriggered: false,
@@ -351,16 +414,22 @@
         archiveRead: false,
         dateJumpReplyIndex: 0,
         easterEggMailShown: false,
+        tipMailCount: 0,
+        j0108SuccessCount: 0,
+        j0108RandomReplyIndex: 0,
         locationClosedReplyShown: false,
         tipMailShown: false,
+        keywordRevealed: false,
+        locationAgreed: false,
+        sosSent: false,
+        missingInspectorMailRead: false,
         triggeredAttachmentReplies: {
             bg1: false, bg3: false, bg4: false,
             diary: false, healthReport: false,
             monologueGarbled: false, monologueCorrect: false, archive: false
         }
     };
-    let mailReadStatus = [false, false, false, false, false, false];
-    let sentMails = [];
+    let mailReadStatus = {};
     let isInMailDetail = false;
     let currentContact = 'juzumaru';
     let currentTrack = 0;
@@ -376,7 +445,7 @@
     let currentCameraImages = [];
 
     const endingData = {
-        "垂慈摄受": { image: "assets/images/lingyuan_end.png", title: "垂慈摄受", subtitle: "Good End", audio: "assets/audio/ending_bgm.mp3", texts: [
+        "垂慈摄受": { image: "chuici_end.jpg", title: "垂慈摄受", subtitle: "Good End", audio: "assets/audio/chuici_bgm.mp3", texts: [
             "受缘爱，爱缘取，取缘有，有缘生……",
             { jp: "ええ、わかっております。", cn: "嗯，我知道的" },
             { jp: "あなた様が、私を愛してくださっていること。", cn: "您，爱着我这件事" },
@@ -389,7 +458,7 @@
             { jp: "どうか、何度でも私に聞かせてください。", cn: "也请您无论多少次都说给我听吧" },
             { jp: "あなた様が嫌になるほど言われても、私は決して聞き飽きることはございません。", cn: "就算您会说到厌烦，我也永远都不可能会听腻的" }
         ] },
-        "空花阳焰": { image: "assets/images/kongxiang_end.png", title: "空花阳焰", subtitle: "Open End", audio: "assets/audio/ending_bgm.mp3", texts: [
+        "空花阳焰": { image: "konghua_end.jpg", title: "空花阳焰", subtitle: "Open End", audio: "assets/audio/konghua_bgm.mp3", texts: [
             "看似愈合的硬痂下",
             "痛苦仍随着脉搏跳动",
             "我想我不该留下",
@@ -399,7 +468,7 @@
             "也许某一天我能学会",
             "不需要任何人都能走下去"
         ] },
-        "酬愿": { image: "assets/images/ruyue_end.png", title: "酬愿", subtitle: "Happy End", audio: "assets/audio/ending_bgm.mp3", texts: [
+        "酬愿": { image: "chouyuan_end.jpg", title: "酬愿", subtitle: "Happy End", audio: "assets/audio/chouyuan_bgm.mp3", texts: [
             "为欲酬愿，示现成佛。",
             "以此善根，酬其本愿。",
             { jp: "人の一生、いや、私たちのような存在の一生も。", cn: "人的一生，或者说像我们这般的存在" },
@@ -414,7 +483,7 @@
             "最终交汇在一起",
             "无论何时，何地，以何种形式"
         ] },
-        "须弥芥子": { image: "assets/images/huzhong_end.png", title: "须弥芥子", subtitle: "Normal End", audio: "assets/audio/ending_bgm.mp3", texts: [
+        "须弥芥子": { image: "xumi_end.jpg", title: "须弥芥子", subtitle: "Bad End", audio: "assets/audio/xumi_bgm.mp3", texts: [
             { jp: "昨夜の約束、覚えておりますか、▊▊。", cn: "还记得昨夜的约定吗，▊▊" },
             { jp: "今日一日、私がお世話させていただきます。", cn: "今天一整天，都由我来照顾您" },
             { jp: "午前中は、近侍としてここでお仕事をお手伝いしましょう。", cn: "上午，就由我作为近侍，在这里帮您处理工作吧" },
@@ -424,7 +493,7 @@
             { jp: "一日中ここでお傍にいてもよいのでございます。", cn: "一整天都在这里陪伴您也很好" },
             { jp: "あなた様の今日という時間を、すべて私にくださいませんか。", cn: "能将您今天的时间，全部都交给我吗" }
         ] },
-        "一莲托生": { image: "assets/images/gongfan_end.png", title: "一莲托生", subtitle: "True End", audio: "assets/audio/ending_bgm.mp3", texts: [
+        "一莲托生": { image: "yilian_end.jpg", title: "一莲托生", subtitle: "True End", audio: "assets/audio/yilian_bgm.mp3", texts: [
             "我想变成雾",
             "看似能触摸却又无法触及",
             "想要抓住又从指缝间溜走",
@@ -436,7 +505,7 @@
             { jp: "あなた様の色で、私を染めてください。", cn: "用您的颜色来浸染我吧" },
             { jp: "私が、あなた様なしでは生きられぬほどに。", cn: "直到我，没有您便无法存活下去那般" }
         ] },
-        "徒然无所得": { image: "assets/images/fanhang_end.png", title: "徒然无所得", subtitle: "Bad End", audio: "assets/audio/ending_bgm.mp3", texts: [
+        "徒然无所得": { image: "turan_end.jpg", title: "徒然无所得", subtitle: "Normal End", audio: "assets/audio/turan_bgm.mp3", texts: [
             "多亏了时之政府的帮助",
             "你成功回到了自己的时代",
             "虽然没见到一开始遇见的好心检察官",
@@ -444,34 +513,72 @@
             "不过这已经不重要了",
             "重要的是你回到了属于你的地方"
         ] },
-        "迷途": { image: "assets/images/mitu_end.png", title: "迷途", subtitle: "Sad End", audio: "assets/audio/ending_bgm.mp3", texts: [
+        "迷途": { image: "mitu_end.jpg", title: "迷途", subtitle: "Sad End", audio: "assets/audio/mitu_bgm.mp3", texts: [
             "\"众生迷途，不知出要。\"——《华严经》",
             "你忘记了为什么启航",
             "你只是麻木的行走在时光中",
             "一如过往"
         ] },
-        "如是观": { image: "assets/images/rushi_end.png", title: "如是观", subtitle: "Reload End", audio: "assets/audio/ending_bgm.mp3", texts: [
+        "如是观": { image: "assets/images/rushi_end.png", title: "如是观", subtitle: "Reload End", audio: "assets/audio/rushi_bgm.mp3", texts: [
             "一切有为法，如梦幻泡影",
             "如露亦如电，应作如是观"
         ] }
     };
 
     function escapeHtml(s) { return String(s).replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':m==='>'?'&gt;':''); }
+    function createReceivedBubbleHTML(jp, cn) {
+        return `<div class="bubble"><div class="jp-text">${escapeHtml(jp)}</div><hr class="bubble-divider"><div class="cn-text">${escapeHtml(cn)}</div></div>`;
+    }
+    function createSentBubbleHTML(text, failed) {
+        const marker = failed ? '<span style="color:#e06c75;">❗</span>' : '';
+        return `${marker}<div class="bubble">${escapeHtml(text)}</div>`;
+    }
+
+    function isFileUnlocked(fileId) {
+        switch (fileId) {
+            case 'diary':
+                return (calendarSelectedDate >= '2024-01-19' && calendarSelectedDate <= '2026-11-03') || state.aboutThatDayShown;
+            case 'healthReport':
+                return (calendarSelectedDate >= '2213-07-13' && calendarSelectedDate <= '2214-01-18') || state.healthReportShown;
+            case 'archive':
+                return calendarSelectedDate >= '2225-07-03';
+            case 'monologue':
+                return state.musicPlayedFlags.some(v => v);
+            default:
+                return false;
+        }
+    }
+
+    function showConfirmDialog(message, onConfirm, onCancel) {
+        const panel = document.createElement('div');
+        panel.className = 'root-panel';
+        panel.innerHTML = `<div style="background:rgba(0,0,0,0.8);padding:30px;border-radius:28px;text-align:center;">
+            <p style="color:#f0eaff;margin-bottom:24px;">${message}</p>
+            <button id="confirmYes">是</button><button id="confirmNo">否</button>
+        </div>`;
+        document.getElementById('phoneInner').appendChild(panel);
+        panel.querySelector('#confirmYes').addEventListener('click', () => { panel.remove(); onConfirm(); });
+        panel.querySelector('#confirmNo').addEventListener('click', () => { panel.remove(); if (onCancel) onCancel(); });
+    }
     function showNotification(msg) {
         const n = document.createElement('div'); n.className='notification'; n.innerText=msg;
-        document.getElementById('phoneInner').appendChild(n); setTimeout(()=>n.remove(),3000);
+        const phoneInner = document.getElementById('phoneInner');
+        if (phoneInner) phoneInner.appendChild(n);
+        setTimeout(()=>{ if(n.parentNode) n.remove(); },3000);
     }
     function showToast(msg) {
-        const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+        const t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = msg; t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 3000);
     }
 
     function showEnding(title, msg) {
         if (state.endingTriggered) return;
         state.endingTriggered = true; saveAll();
-        const ending = endingData[title] || { image: "assets/images/ending_placeholder.png", title: title, subtitle: "", audio: "assets/audio/ending_bgm.mp3", texts: [msg] };
+        const ending = endingData[title] || { image: "assets/images/ending_placeholder.png", title: title, subtitle: "", audio: "assets/audio/mitu_bgm.mp3", texts: [msg] };
         
-        const endingBgm = new Audio(ending.audio || 'assets/audio/ending_bgm.mp3');
+        const endingBgm = new Audio(ending.audio || 'assets/audio/mitu_bgm.mp3');
         endingBgm.loop = true;
         endingBgm.volume = 0.5;
         endingBgm.play().catch(e => console.log('BGM play failed:', e));
@@ -516,10 +623,14 @@
         function cycle() {
             pairs[current].classList.remove('active');
             setTimeout(() => {
-                current = (current + 1) % pairs.length;
-                pairs[current].classList.add('active');
+                current = current + 1;
+                if (current < pairs.length) {
+                    pairs[current].classList.add('active');
+                    if (current + 1 < pairs.length) {
+                        setTimeout(cycle, holdDuration + fadeDuration * 2);
+                    }
+                }
             }, fadeDuration);
-            setTimeout(cycle, holdDuration + fadeDuration * 2);
         }
 
         pairs[0].classList.add('active');
@@ -534,10 +645,17 @@
     }
 
     function saveAll() {
-        localStorage.setItem('renge_final_state', JSON.stringify(state));
-        localStorage.setItem('renge_final_mailRead', JSON.stringify(mailReadStatus));
-        localStorage.setItem('renge_final_sentMails', JSON.stringify(sentMails));
-        localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
+        localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(state));
+        localStorage.setItem(STORAGE_KEYS.MAIL_READ, JSON.stringify(mailReadStatus));
+        localStorage.setItem(STORAGE_KEYS.CALENDAR, JSON.stringify(calendarEvents));
+    }
+
+    let pendingSave = false;
+    function requestSave() {
+        if (!pendingSave) {
+            pendingSave = true;
+            setTimeout(() => { saveAll(); pendingSave = false; }, 200);
+        }
     }
 
     let mapScale = 2.0, mapX = 0, mapY = 0;
@@ -550,12 +668,9 @@
         const img = document.getElementById('mapImage');
         if (!container || !img) return;
         const cw = container.clientWidth, ch = container.clientHeight;
-        // 使用 clientWidth 获取 CSS 渲染后的基础尺寸（包含 width:200% 等），再乘缩放比例
         const baseW = img.clientWidth || (img.naturalWidth || cw * 2);
         const baseH = img.clientHeight || (img.naturalHeight || ch * 2);
         const scaledW = baseW * mapScale, scaledH = baseH * mapScale;
-        // transform-origin: center center 下，translate 移动的是中心点
-        // 图片边缘刚好对齐容器边缘时的最大偏移量
         const halfDiffX = Math.max(0, (scaledW - cw) / 2);
         const halfDiffY = Math.max(0, (scaledH - ch) / 2);
         mapX = Math.max(-halfDiffX, Math.min(halfDiffX, mapX));
@@ -652,91 +767,142 @@
         clampMap(); applyMapTransform(true);
     }
 
-    function openMap() {
-        document.getElementById('homeScreen').style.display='none';
-        document.querySelectorAll('.fullscreen-view').forEach(v=>v.style.display='none');
-        document.getElementById('cameraScreen').style.display='none';
-        document.getElementById('mapScreen').style.display='flex';
-        initMapGestures();
-        resetMapView();
-    }
-
     function loadAll() {
-        const s = localStorage.getItem('renge_final_state');
-        if (s) {
-            const parsed = JSON.parse(s);
-            Object.assign(state, parsed);
-            if (state.j0108FailureReplyIndex === undefined) state.j0108FailureReplyIndex = 0;
-            if (state.cameraImageIndex === undefined) state.cameraImageIndex = 0;
-            if (state.californiaAdded === undefined) state.californiaAdded = false;
-            if (state.easterEggTriggered === undefined) state.easterEggTriggered = false;
-            if (state.specialMemoDeleted === undefined) state.specialMemoDeleted = false;
-            if (state.sosMail3Shown === undefined) state.sosMail3Shown = false;
-            if (state.sosMail6Shown === undefined) state.sosMail6Shown = false;
-            if (state.archiveRead === undefined) state.archiveRead = false;
-            if (state.dateJumpReplyIndex === undefined) state.dateJumpReplyIndex = 0;
-            if (state.easterEggMailShown === undefined) state.easterEggMailShown = false;
-            if (state.locationClosedReplyShown === undefined) state.locationClosedReplyShown = false;
-            if (state.tipMailShown === undefined) state.tipMailShown = false;
-            if (state.gongfanSequenceTriggered === undefined) state.gongfanSequenceTriggered = false;
-            if (state.huzhongSequenceTriggered === undefined) state.huzhongSequenceTriggered = false;
-            if (state.restartCount === undefined) state.restartCount = 0;
-            if (state.dateJumpCount === undefined) state.dateJumpCount = 0;
-            if (!state.triggeredAttachmentReplies) {
-                state.triggeredAttachmentReplies = {
-                    bg1: false, bg3: false, bg4: false,
-                    diary: false, healthReport: false,
-                    monologueGarbled: false, monologueCorrect: false, archive: false
-                };
+        try {
+            const s = localStorage.getItem(STORAGE_KEYS.STATE);
+            if (s) Object.assign(state, JSON.parse(s));
+            const mr = localStorage.getItem(STORAGE_KEYS.MAIL_READ);
+            if (mr) {
+                const parsed = JSON.parse(mr);
+                if (parsed && typeof parsed === 'object') mailReadStatus = parsed;
             }
+            calendarEvents = JSON.parse(localStorage.getItem(STORAGE_KEYS.CALENDAR) || '{}');
+            migrateCalendarEvents();
+            updateChatTitle();
+            setOnlineStatus();
+            loadChatHistory();
+            updateSongDisplay();
+            updateClockDate();
+            checkMissingInspectorMail();
+            updateDarkOverlay();
+            updateChatInputHints();
+        } catch (e) {
+            console.error('loadAll error:', e);
         }
-        const mr = localStorage.getItem('renge_final_mailRead');
-        if (mr) {
-            const parsedMr = JSON.parse(mr);
-            mailReadStatus = parsedMr;
-            while (mailReadStatus.length < 7) mailReadStatus.push(false);
-        }
-        const sm = localStorage.getItem('renge_final_sentMails');
-        if (sm) sentMails = JSON.parse(sm);
-        calendarEvents = JSON.parse(localStorage.getItem('calendarEvents') || '{}');
-        migrateCalendarEvents();
-        applyDarkTheme(false);
-        updateChatTitle();
-        setOnlineStatus(true);
-        loadChatHistory();
-        updateSongDisplay();
-        updateClockDate();
-        checkMissingInspectorMail();
-        updateDarkOverlay();
+    }
+    const dom = {};
+    function initDomCache() {
+        dom.chatMessages = document.getElementById('chatMessages');
+        dom.chatScreen = document.getElementById('chatScreen');
+        dom.chatInput = document.getElementById('chatInput');
+        dom.chatTitle = document.getElementById('chatTitle');
+        dom.mailContent = document.getElementById('mailContent');
+        dom.calendarContent = document.getElementById('calendarContent');
+        dom.settingsContent = document.getElementById('settingsContent');
+        dom.phoneInner = document.getElementById('phoneInner');
+        dom.albumContent = document.getElementById('albumContent');
+        dom.memoContent = document.getElementById('memoContent');
+        dom.calendarScreen = document.getElementById('calendarScreen');
+        dom.mailScreen = document.getElementById('mailScreen');
+        dom.memoScreen = document.getElementById('memoScreen');
+        dom.settingsScreen = document.getElementById('settingsScreen');
+        dom.albumScreen = document.getElementById('albumScreen');
+        dom.cameraScreen = document.getElementById('cameraScreen');
+        dom.mapScreen = document.getElementById('mapScreen');
+        dom.homeScreen = document.getElementById('homeScreen');
+        dom.messageListScreen = document.getElementById('messageListScreen');
+        dom.blackScreenOverlay = document.getElementById('blackScreenOverlay');
+        dom.timeJumpDigits = document.getElementById('timeJumpDigits');
+        dom.darkOverlay = document.getElementById('darkOverlay');
+        dom.toast = document.getElementById('toast');
+        dom.progressFill = document.getElementById('progressFill');
+        dom.currentTime = document.getElementById('currentTime');
+        dom.totalTime = document.getElementById('totalTime');
+        dom.currentSongName = document.getElementById('currentSongName');
+        dom.lyricsPreview = document.getElementById('lyricsPreview');
+        dom.playPauseBtn = document.getElementById('playPauseBtn');
+        dom.clockDate = document.getElementById('clockDate');
+        dom.clockTime = document.getElementById('clockTime');
+        dom.statusTime = document.getElementById('statusTime');
+        dom.batteryPercent = document.getElementById('batteryPercent');
+        dom.batteryFill = document.getElementById('batteryFill');
+        dom.onlineDot = document.getElementById('onlineDot');
+        dom.offlineBanner = document.getElementById('offlineBanner');
+        dom.mapContainer = document.getElementById('mapContainer');
+        dom.mapWrapper = document.getElementById('mapWrapper');
+        dom.mapImage = document.getElementById('mapImage');
+        dom.mapMarker = document.getElementById('mapMarker');
+        dom.mapCoords = document.getElementById('mapCoords');
+        dom.cameraBackground = document.getElementById('cameraBackground');
+        dom.messageListContainer = document.getElementById('messageListContainer');
+        dom.chatInputHints = document.getElementById('chatInputHints');
+    }
+    function setFlag(flagName) {
+        if (!state[flagName]) { state[flagName] = true; return true; }
+        return false;
     }
 
-    function setOnlineStatus(online) { const dot = document.getElementById('onlineDot'); if (dot) dot.classList.toggle('online', online); }
-    function applyDarkTheme(dark) { document.getElementById('phoneInner').classList.toggle('dark-theme', dark); }
+    function setOnlineStatus(online) {
+        const dot = document.getElementById('onlineDot');
+        const isOnline = online !== undefined ? online : (currentContact === 'juzumaru' ? !state.j0108Offline : false);
+        if (dot) dot.classList.toggle('online', isOnline);
+        const banner = document.getElementById('offlineBanner');
+        if (banner) banner.classList.toggle('show', state.j0108Offline && currentContact === 'juzumaru');
+    }
     function updateChatTitle() {
         const titleEl = document.getElementById('chatTitle');
         if (titleEl) titleEl.innerText = currentContact === 'juzumaru' ? 'J-0108' : '加州清光';
     }
-    function unlockBg4() {
-        if (!state.bg4Unlocked && !state.availableImages.includes('assets/images/lotus.jpg')) {
-            state.bg4Unlocked = true;
-            state.availableImages.push('assets/images/lotus.jpg');
-            saveAll();
+
+    function getChatHistoryKey() { return STORAGE_KEYS.CHAT_PREFIX + currentContact; }
+
+    function queueMessages(replies, contactId, onComplete) {
+        if (!replies || replies.length === 0) { if (onComplete) onComplete(); return; }
+        let cumulativeDelay = 2000 + Math.floor(Math.random() * 3000);
+        let completed = 0;
+        replies.forEach((reply, index) => {
+            if (index > 0) cumulativeDelay += 2000 + Math.floor(Math.random() * 3000);
+            setTimeout(() => {
+                if (state.endingTriggered) return;
+                pushContactMessage(reply, contactId);
+                completed++;
+                if (onComplete && completed === replies.length) onComplete();
+            }, cumulativeDelay);
+        });
+    }
+
+    function pushContactMessage(replyObj, contactId) {
+        if (contactId === 'juzumaru' && state.j0108Offline) return;
+        const msg = { type: 'received', content: replyObj };
+        const isCurrentChat = (currentContact === contactId) && (dom.chatScreen && dom.chatScreen.style.display === 'flex');
+        if (isCurrentChat) {
+            renderMessage(msg, dom.chatMessages);
+            if (dom.chatMessages) dom.chatMessages.scrollTop = dom.chatMessages.scrollHeight;
+            saveChatMessage(msg, contactId);
+        } else {
+            saveChatMessage(msg, contactId);
+            const name = contactId === 'juzumaru' ? 'J-0108' : '加州清光';
+            showNotification(name + ' 发来新消息');
         }
     }
-    function getChatHistoryKey() { return `chat_history_${currentContact}`; }
-    function saveChatMessage(msg) {
-        let history = JSON.parse(localStorage.getItem(getChatHistoryKey()) || '[]');
+
+    function saveChatMessage(msg, contactId) {
+        const key = STORAGE_KEYS.CHAT_PREFIX + (contactId || currentContact);
+        let history = JSON.parse(localStorage.getItem(key) || '[]');
         history.push(msg);
-        localStorage.setItem(getChatHistoryKey(), JSON.stringify(history));
+        localStorage.setItem(key, JSON.stringify(history));
     }
+
     function loadChatHistory() {
-        const container = document.getElementById('chatMessages');
-        container.innerHTML = '';
-        const history = JSON.parse(localStorage.getItem(getChatHistoryKey()) || '[]');
-        history.forEach(msg => renderMessage(msg, container));
-        container.scrollTop = container.scrollHeight;
+        if (!dom.chatMessages) return;
+        dom.chatMessages.innerHTML = '';
+        const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.CHAT_PREFIX + currentContact) || '[]');
+        history.forEach(msg => renderMessage(msg, dom.chatMessages));
+        dom.chatMessages.scrollTop = dom.chatMessages.scrollHeight;
     }
+
     function renderMessage(msg, container) {
+        if (!container) return;
         if (msg.type === 'sent') {
             if (msg.isImage) {
                 container.insertAdjacentHTML('beforeend', `<div class="message sent" style="transform:rotate(5deg);"><div class="polaroid"><img src="${msg.url}" style="max-width:160px;max-height:200px;"></div></div>`);
@@ -748,53 +914,290 @@
         } else {
             const content = msg.content;
             if (content && typeof content === 'object' && content.jp) {
-                container.insertAdjacentHTML('beforeend', `<div class="message received"><div class="bubble"><div class="jp-text">${escapeHtml(content.jp)}</div><hr class="bubble-divider"><div class="cn-text">${escapeHtml(content.cn)}</div></div></div>`);
+                container.insertAdjacentHTML('beforeend', `<div class="message received">${createReceivedBubbleHTML(content.jp, content.cn)}</div>`);
             } else {
                 container.insertAdjacentHTML('beforeend', `<div class="message received"><div class="bubble">${escapeHtml(content)}</div></div>`);
             }
         }
     }
 
-    function addJ0108MessageNow(replyObj) {
-        const div = document.createElement('div'); div.className='message received';
-        div.innerHTML = `<div class="bubble"><div class="jp-text">${escapeHtml(replyObj.jp)}</div><hr class="bubble-divider"><div class="cn-text">${escapeHtml(replyObj.cn)}</div></div>`;
-        document.getElementById('chatMessages').appendChild(div);
-        document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-        saveChatMessage({ type: 'received', content: replyObj });
+    function appendMessageToChat(msg) {
+        if (!dom.chatMessages) return;
+        renderMessage(msg, dom.chatMessages);
+        dom.chatMessages.scrollTop = dom.chatMessages.scrollHeight;
+        saveChatMessage(msg, currentContact);
     }
 
-    function queueJ0108Messages(replies, onComplete) {
-        if (!replies || replies.length === 0) {
-            if (onComplete) onComplete();
+    const conditions = {
+        coreFiles: () => state.triggeredAttachmentReplies.diary && state.triggeredAttachmentReplies.healthReport && state.triggeredAttachmentReplies.archive,
+        bothMonologues: () => state.triggeredAttachmentReplies.monologueGarbled && state.triggeredAttachmentReplies.monologueCorrect,
+        lateGame: () => state.keywordRevealed && state.locationAgreed && state.triggeredAttachmentReplies.bg3,
+        easterEgg: () => state.easterEggTriggered,
+        readMissingMail: () => state.missingInspectorMailRead,
+        noSOS: () => !state.sosSent,
+        chuici: () => state.triggeredAttachmentReplies.diary && state.triggeredAttachmentReplies.archive && state.keywordRevealed && state.locationAgreed && !state.sosSent,
+        chouyuan: () => state.triggeredAttachmentReplies.diary && state.triggeredAttachmentReplies.healthReport && state.triggeredAttachmentReplies.monologueCorrect && state.triggeredAttachmentReplies.archive && state.keywordRevealed && state.locationAgreed && state.triggeredAttachmentReplies.bg3 && !state.sosSent && !state.easterEggTriggered,
+        konghua: () => !state.triggeredAttachmentReplies.diary && !state.triggeredAttachmentReplies.healthReport && !state.triggeredAttachmentReplies.monologueCorrect && !state.triggeredAttachmentReplies.archive && !state.keywordRevealed && !state.locationAgreed && !state.triggeredAttachmentReplies.bg3 && state.sosSent && state.readDiary && state.readHealthReport && state.readMonologue && state.archiveRead
+    };
+
+    function checkEndings(txt) {
+        if (state.endingTriggered || state.gongfanSequenceTriggered || state.huzhongSequenceTriggered) return;
+
+        if (conditions.coreFiles() && conditions.bothMonologues() && conditions.lateGame() && conditions.noSOS() && conditions.easterEgg() && conditions.readMissingMail()) {
+            state.gongfanSequenceTriggered = true; saveAll();
+            triggerAttachmentReply([
+                { jp: "私は、あまりにも愚かでございました。", cn: "是我，太过愚钝了。" },
+                { jp: "どうか、お許しください。あなた様の孤独も、覚悟も、あまりにも浅く見ておりました。", cn: "请您原谅。我将您的孤独，您的觉悟，看得太过浅薄了。" },
+                { jp: "守りたいものは側にあったのに、手が届かない。幸福な記憶だけが鋭い刃となって、胸を突き刺し続けております。", cn: "想要保护的东西就在身边，却够不着。唯有幸福的记忆化作了锋利的刀刃，一直刺入胸膛。" },
+                { jp: "あの少女が追いかけていたのは、儚い何かではありませんでした。", cn: "那位少女追逐的并非虚无缥缈的存在。" },
+                { jp: "変えられない運命そのものでございました。", cn: "是无法改变的命运本身。" },
+                { jp: "もしあなた様の魂が救いを求めないのならば、私はあなた様と共に地獄へ堕ちましょう。", cn: "若您的灵魂不寻求救赎，我便与您一同堕入地狱。" },
+                { jp: "それこそが、私たちの一蓮托生の契約でございます。", cn: "那便是，我们一莲托生之契约。" }
+            ], () => showEnding("一莲托生", "True End"));
             return;
         }
-        let cumulativeDelay = 2000 + Math.floor(Math.random() * 3000);
-        let completed = 0;
-        replies.forEach((reply, index) => {
-            if (index > 0) cumulativeDelay += 2000 + Math.floor(Math.random() * 3000);
-            setTimeout(() => {
-                if (state.endingTriggered) return;
-                if (currentContact !== 'juzumaru') return;
-                const chatScreen = document.getElementById('chatScreen');
-                if (chatScreen && chatScreen.style.display === 'flex') {
-                    addJ0108MessageNow(reply);
-                } else {
-                    saveChatMessage({ type: 'received', content: reply });
-                    showNotification('J-0108 发来新消息');
-                }
-                completed++;
-                if (onComplete && completed === replies.length) {
-                    onComplete();
-                }
-            }, cumulativeDelay);
+
+        if (/我喜欢你|我爱你|想见你/i.test(txt)) {
+            if (conditions.chuici()) {
+                triggerAttachmentReply([
+                    { jp: "なぜなら……", cn: "因为……" },
+                    { jp: "あなた様が戻ってきてくださったこと……", cn: "您能回来这件事……" },
+                    { jp: "それが、とても嬉しかったのでございます。", cn: "令我欣喜万分。" },
+                    { jp: "だから……", cn: "所以……" },
+                    { jp: "どうしても上手く話せなくて……", cn: "无论如何都没法好好说话的感觉……" },
+                    { jp: "今、心から歓びを感じております。", cn: "我现在，正从心底里感到欢喜。" },
+                    { jp: "数珠丸恒次というこの刀が、あなた様の寵愛を受けたことは、どれほど満ち足りていることか。", cn: "名为数珠丸恒次的这把刀，获得了您的垂怜，是何等地感到满足。" },
+                    { jp: "そして、この喜びが、どれほど独占的で、傲慢なものであることか。", cn: "以及，这份喜悦，是何等地具有独占性，又是何等地傲慢。" },
+                    { jp: "そう思うことは、罪深いことでございましょうか。", cn: "如此想着，是罪孽深重的事情吗。" },
+                    { jp: "これから先、私は決してあなた様の傍を離れません。", cn: "从今往后，我绝不会离开您身边。" }
+                ], () => showEnding("垂慈摄受", "Good End"));
+                return;
+            }
+        }
+
+        if (/我该走了|离开|回家/.test(txt)) {
+            if (conditions.konghua()) {
+                showEnding("空花阳焰", "Open End"); return;
+            }
+        }
+
+        if (txt.trim() === '我回来了') {
+            if (conditions.chouyuan()) {
+                triggerAttachmentReply([
+                    { jp: "仏の教えでは、縁をよく説きます。一つ一つの選択、一つ一つの思いが、無数の糸となって未来を織り上げる。選んだ糸によって、織り上がる紋様も千差万別でございましょう。", cn: "佛法中常说缘分。每一个选择，每一个意念，都会化作无数丝线编织未来。根据选择丝线的不同，织出的纹样也会千变万化吧。" },
+                    { jp: "しかし、定められた縁で結ばれた糸は、どれほど複雑に絡み合おうとも、最後には必ず交わるのでございます。", cn: "然而，被既定缘分连接的丝线，无论如何复杂地缠绕，最终总会交汇。" },
+                    { jp: "あなた様は自らの意志で道を選び、歩いてこられました。そしてその道の果てに、私と出会ったのでございます。", cn: "您以自身意志择定了道路，并一路行来。然后在这道路的尽头，与我相遇。" },
+                    { jp: "私にとって大切なのは、あなた様がここにおられること。あなた様の選択が最終的に私へと至ったことでございます。", cn: "于我而言重要的，是您身处此地。是您的选择最终导向了我。" },
+                    { jp: "それだけで、十分に余りあることなのでございます。", cn: "仅此而已，便已足矣。" }
+                ], () => showEnding("酬愿", "Happy End"));
+                return;
+            }
+        }
+
+        if (conditions.coreFiles() && conditions.bothMonologues() && conditions.lateGame() && conditions.noSOS()) {
+            state.huzhongSequenceTriggered = true; saveAll();
+            triggerAttachmentReply([
+                { jp: "本当の悲劇は、地獄に身を置くことではなく、極楽の門前で地獄の真実を知ることだと、そうおっしゃりたいのでございますね。", cn: "您是想告诉我，真正的悲剧并非身处地狱，而是在极乐门前知晓了地狱的真相吗。" },
+                { jp: "実に、あなた様らしい教えでございます。", cn: "真是很有您风格的教诲。" },
+                { jp: "承知いたしました。この修行、謹んで受けさせていただきます。", cn: "我明白了，这场修行，我谨当领受。" }
+            ], () => showEnding("须弥芥子", "Bad End"));
+            return;
+        }
+    }
+
+    function ensureMailFlag(flagKey, mailId, notificationText) {
+        if (state[flagKey]) return;
+        state[flagKey] = true;
+        showNotification(notificationText);
+        if (dom.mailScreen && dom.mailScreen.style.display === 'flex') renderMailList();
+    }
+
+    function handleUserInteraction() {
+        ensureMailFlag('dawnReplyMailShown', 'base_2', '收到新邮件：拂晓的应答');
+    }
+
+    function checkMissingInspectorMail() {
+        if (calendarSelectedDate >= '2216-11-14') {
+            ensureMailFlag('missingInspectorMailShown', 'base_1', '收到新邮件：关于‘失踪检察官’问询函');
+        }
+    }
+
+    function handleDateJumpTriggers() {
+        if (state.sosSent) {
+            if (state.dateJumpCount >= 3) ensureMailFlag('sosMail3Shown', 'sos_1', '收到新邮件：时之政府的回信');
+            if (state.dateJumpCount >= 6) ensureMailFlag('sosMail6Shown', 'sos_2', '收到新邮件：时之政府的回信');
+        }
+        if (calendarSelectedDate === '2023-01-05') ensureMailFlag('easterEggMailShown', 'easter_egg', '收到新邮件：客串事件');
+    }
+
+    function updateChatInputHints() {
+        if (currentContact !== 'juzumaru' || state.endingTriggered) {
+            if (dom.chatInputHints) dom.chatInputHints.innerHTML = '';
+            return;
+        }
+        const hints = [];
+        if (conditions.chuici()) hints.push({ text: '我喜欢你', label: '垂慈摄受' });
+        if (conditions.chouyuan()) hints.push({ text: '我回来了', label: '酬愿' });
+        if (conditions.konghua()) hints.push({ text: '我该走了', label: '空花阳焰' });
+        if (dom.chatInputHints) {
+            dom.chatInputHints.innerHTML = hints.map(h => `<span class="chat-hint-tag" data-hint="${escapeHtml(h.text)}">${escapeHtml(h.label)}</span>`).join('');
+            dom.chatInputHints.querySelectorAll('.chat-hint-tag').forEach(tag => {
+                tag.addEventListener('click', () => {
+                    const input = dom.chatInput;
+                    if (input) input.value = tag.dataset.hint;
+                });
+            });
+        }
+    }
+
+    function triggerAttachmentReply(replies, onComplete) {
+        if (!state.j0108ContactUnlocked || currentContact !== 'juzumaru') return;
+        queueMessages(replies, 'juzumaru', onComplete);
+    }
+
+    function insertLocationPrompt() {
+        const container = dom.chatMessages;
+        if (!container) return;
+        const promptDiv = document.createElement('div');
+        promptDiv.className = 'location-prompt-message';
+        promptDiv.innerHTML = `<div class="location-prompt-text">是否授权获取当前位置？</div><div class="location-prompt-buttons"><button class="location-prompt-btn yes" id="locationYesBtn">是</button><button class="location-prompt-btn" id="locationNoBtn">否</button></div>`;
+        container.appendChild(promptDiv);
+        container.scrollTop = container.scrollHeight;
+        const yesBtn = document.getElementById('locationYesBtn');
+        const noBtn = document.getElementById('locationNoBtn');
+        if (yesBtn) yesBtn.addEventListener('click', () => {
+            if (state.locationPromptAnswered) return;
+            state.locationPromptAnswered = 'yes';
+            state.locationAgreed = true; requestSave();
+            promptDiv.innerHTML = '<div class="location-prompt-text">✓ 已授权位置信息</div>';
+            proceedAfterLocationChoice(true);
+        });
+        if (noBtn) noBtn.addEventListener('click', () => {
+            if (state.locationPromptAnswered) return;
+            state.locationPromptAnswered = 'no';
+            state.locationAgreed = false; requestSave();
+            promptDiv.innerHTML = '<div class="location-prompt-text">✗ 已拒绝授权</div>';
+            proceedAfterLocationChoice(false);
         });
     }
 
-    function addJ0108Message(replyObj) { queueJ0108Messages([replyObj]); }
+    function proceedAfterLocationChoice(agreed) {
+        if (agreed) {
+            const imgUrl = 'assets/images/map_1.png';
+            if (!state.availableImages.includes(imgUrl)) state.availableImages.push(imgUrl);
+            const msg = { type: 'sent', isImage: true, url: imgUrl };
+            appendMessageToChat(msg);
+            queueMessages([
+                { jp: "ご信頼いただき、ありがとうございます。", cn: "感谢您的信任。" },
+                { jp: "少々お待ちください。すぐに参ります。", cn: "请稍等片刻，我即刻前往。" }
+            ], 'juzumaru');
+            const delayedMessages = [
+                { jp: "目的地の近くに到着いたしました。", cn: "已抵达目的地附近。" },
+                { jp: "しかし、あなた様のお姿は見当たりません。", cn: "却未曾发现您的踪迹。" },
+                { jp: "あなた様はお離れになりましたか。", cn: "是您离去了吗？" },
+                { jp: "いえ、それよりも……我々は本当に同じ時空にいるのでございましょうか。", cn: "不……应该说，我们真的处于同一时空吗？" }
+            ];
+            setTimeout(() => {
+                if (state.endingTriggered) return;
+                queueMessages(delayedMessages, 'juzumaru');
+                state.timeJumpHintPending = true; requestSave();
+            }, 60000);
+        } else {
+            if (!state.availableImages.includes('assets/images/map_1.png')) state.availableImages.push('assets/images/map_1.png');
+            const delayedMessages = [
+                { jp: "大丈夫でございます。私を信頼されないのは当然のことでございます。", cn: "无妨。您不信任我是理所当然。" },
+                { jp: "通信の中で、安全な場所への行き方をできるだけお伝えいたします。", cn: "我会在通讯中尽量指引您前往安全之处。" },
+                { jp: "どうかお気をつけてください。", cn: "请您务必小心。" }
+            ];
+            setTimeout(() => {
+                if (state.endingTriggered) return;
+                queueMessages(delayedMessages, 'juzumaru');
+                state.timeJumpHintPending = true; requestSave();
+            }, 5000);
+        }
+        refreshAlbum();
+    }
+
+    function triggerTimeJumpHint() {
+        const messages = [
+            { jp: "端末が正常に動作しておりますならば、時間をジャンプする機能が備わっているはずでございます。", cn: "若您的终端运行如常，应当具备跳转时间的功能。" },
+            { jp: "具体的にどの画面にあるかは、ご自身で探していただく必要がございます。", cn: "具体在何处，还需您自行探寻。" },
+            { jp: "時間ジャンプ後、端末の一部が変化する可能性がございます。", cn: "时间跳转后，您的终端或许会产生一些变化。" },
+            { jp: "時間ジャンプ機能を何度も使いすぎなさらないでください。時空に迷い込むリスクがございます。", cn: "请勿过于频繁使用跳转时间功能，恐有迷失时空的风险。" },
+            { jp: "ご安心ください。私ができる限りお助けいたします。", cn: "请您放心，在下会尽绵薄之力相助。" }
+        ];
+        queueMessages(messages, 'juzumaru');
+        state.timeJumpHintTriggered = true; requestSave();
+    }
+
+    function triggerEasterEgg() {
+        if (state.easterEggTriggered) return;
+        state.easterEggTriggered = true;
+        state.specialMemoDeleted = true;
+        const addCalendarEntry = (text, delay, opts = {}) => {
+            setTimeout(() => {
+                if (!calendarEvents['2026-11-03']) calendarEvents['2026-11-03'] = [];
+                calendarEvents['2026-11-03'].push({ text, status: 0, ...opts });
+                requestSave();
+                if (dom.calendarScreen && dom.calendarScreen.style.display === 'flex') renderCalendar();
+            }, delay);
+        };
+        addCalendarEntry("想去见那个人。就算不是那个人。", 2000, { noDelete: true });
+        addCalendarEntry("我见到了吗？不，我找不到他。", 2000, { noDelete: true });
+        for (let i = 0; i < 5; i++) addCalendarEntry("那不是他。", 2000 + (i + 1) * 200, { noDelete: true, darkRed: true });
+    }
+
+    function sendTextMessage(txt) {
+        if (!txt.trim() || state.endingTriggered) return;
+        if (currentContact === 'juzumaru' && state.j0108Offline) { showToast('对方当前离线，无法发送消息'); if (dom.chatInput) dom.chatInput.value = ''; return; }
+        if (currentContact === 'kashuu') {
+            const msg = { type: 'sent', content: txt, failed: true };
+            appendMessageToChat(msg);
+            if (dom.chatInput) dom.chatInput.value = '';
+            requestSave();
+            return;
+        }
+        if (handleKeywordReply(txt)) { if (dom.chatInput) dom.chatInput.value = ''; handleUserInteraction(); return; }
+        const isEndingKeyword = /我喜欢你|我爱你|想见你|我该走了|离开|回家|我回来了/.test(txt);
+        const success = isEndingKeyword || Math.random() < 0.5;
+        const msg = { type: 'sent', content: txt, failed: !success };
+        appendMessageToChat(msg);
+        if (!success && state.j0108ContactUnlocked && currentContact === 'juzumaru' && state.j0108FailureReplyIndex < j0108FailureReplies.length) {
+            queueMessages([j0108FailureReplies[state.j0108FailureReplyIndex]], 'juzumaru');
+            state.j0108FailureReplyIndex++;
+        }
+        if (success && currentContact === 'juzumaru' && state.j0108ContactUnlocked) {
+            state.j0108SuccessCount++;
+            if (state.j0108SuccessCount % 2 === 0 && state.j0108RandomReplyIndex < j0108RandomReplies.length) {
+                queueMessages([j0108RandomReplies[state.j0108RandomReplyIndex]], 'juzumaru');
+                state.j0108RandomReplyIndex++;
+            }
+            handleIntroSequence();
+        }
+        if (dom.chatInput) dom.chatInput.value = '';
+        handleUserInteraction();
+        checkEndings(txt);
+        requestSave();
+        updateChatInputHints();
+    }
+
+    function handleIntroSequence() {
+        if (!state.j0108IntroSequenceTriggered) {
+            state.j0108IntroSequenceTriggered = true;
+            queueMessages([
+                { jp: "あなた様を早く見つけるために、私の指示に従ってください。", cn: "为尽快找到您，请依照我的提示操作。" },
+                { jp: "これは端末に搭載されております位置情報機能でございます。", cn: "这是终端自带的定位功能，您可点击选择是否授权当前位置。" },
+                { jp: "位置情報が私に送信された後、すぐに見つけ出します。", cn: "定位发送给我后，我会尽快找到您。" }
+            ], 'juzumaru', () => {
+                insertLocationPrompt();
+            });
+        }
+        if (state.timeJumpHintPending && !state.timeJumpHintTriggered) triggerTimeJumpHint();
+    }
 
     const j0108KeywordReplies = [
         { keywords: ["我是"], reply: { jp: "承知いたしました。", cn: "在下记住了。" } },
-        { keywords: ["你是", "你是"], reply: { jp: "私は時之政府特別行動グループの検察官、コードネームJ-0108でございます。お好きにお呼びください。", cn: "在下隶属时之政府特别行动组，代号J-0108。您随意称呼即可。" } },
+        { keywords: ["你是", "你是谁"], reply: { jp: "私は時之政府特別行動グループの検察官、コードネームJ-0108でございます。お好きにお呼びください。", cn: "在下隶属时之政府特别行动组，代号J-0108。您随意称呼即可。" } },
         { keywords: ["J-0108", "0108", "检察官", "J"], reply: { jp: "はい、私でございます。", cn: "我在。" } },
         { keywords: ["真名"], reply: { jp: "そんな細かいことは気になさらなくてよいのでございますよ。", cn: "无需在意这种小事。" } },
         { keywords: ["这是哪", "我在哪"], reply: { jp: "申し訳ございません。現在の権限では、この本丸に関する情報を取得できません。", cn: "抱歉。以我目前的权限还无法获知这所本丸的相关信息。" } },
@@ -823,30 +1226,23 @@
     function handleKeywordReply(txt) {
         if (!state.j0108ContactUnlocked || currentContact !== 'juzumaru') return false;
 
-        // 独立触发：阅读档案后，跳转时间5次以上，发送数珠丸恒次相关关键词
         if (state.archiveRead && state.dateJumpCount >= 5 && /数珠丸恒次|数珠丸|恒次|juzumaru|tsunetsugu|じゅずまるつねつぐ|じゅずまる|つねつぐ/i.test(txt)) {
-            const div = document.createElement('div'); div.className='message sent';
-            div.innerHTML = `<div class="bubble">${escapeHtml(txt)}</div>`;
-            document.getElementById('chatMessages').appendChild(div);
-            saveChatMessage({ type: 'sent', content: txt, failed: false });
+            appendMessageToChat({ type: 'sent', content: txt, failed: false });
             triggerAttachmentReply([
                 { jp: "……", cn: "......" },
                 { jp: "見破られましたね。", cn: "被您看穿了。" },
                 { jp: "いえ、最初からうすうす感じてはおりました。", cn: "应该说，最初便隐隐有所感。" },
                 { jp: "まるで宿命のように……", cn: "宛如宿命一般……" }
             ]);
-            if (!state.cond6) { state.cond6 = true; saveAll(); }
+            if (!state.keywordRevealed) { state.keywordRevealed = true; requestSave(); }
             return true;
         }
 
         for (const item of j0108KeywordReplies) {
             for (const kw of item.keywords) {
                 if (txt.includes(kw)) {
-                    const div = document.createElement('div'); div.className='message sent';
-                    div.innerHTML = `<div class="bubble">${escapeHtml(txt)}</div>`;
-                    document.getElementById('chatMessages').appendChild(div);
-                    saveChatMessage({ type: 'sent', content: txt, failed: false });
-                    addJ0108Message(item.reply);
+                    appendMessageToChat({ type: 'sent', content: txt, failed: false });
+                    queueMessages([item.reply], 'juzumaru');
                     return true;
                 }
             }
@@ -854,239 +1250,33 @@
         return false;
     }
 
-    function triggerAttachmentReply(replies, onComplete) {
-        if (!state.j0108ContactUnlocked || currentContact !== 'juzumaru') return;
-        queueJ0108Messages(replies, onComplete);
-    }
-
-    function insertLocationPrompt() {
-        const container = document.getElementById('chatMessages');
-        const promptDiv = document.createElement('div');
-        promptDiv.className = 'location-prompt-message';
-        promptDiv.innerHTML = `<div class="location-prompt-text">是否授权获取当前位置？</div><div class="location-prompt-buttons"><button class="location-prompt-btn yes" id="locationYesBtn">是</button><button class="location-prompt-btn" id="locationNoBtn">否</button></div>`;
-        container.appendChild(promptDiv);
-        container.scrollTop = container.scrollHeight;
-        document.getElementById('locationYesBtn').addEventListener('click', () => {
-            if (state.locationPromptAnswered) return;
-            state.locationPromptAnswered = 'yes';
-            state.cond7 = true; saveAll();
-            promptDiv.innerHTML = '<div class="location-prompt-text">✓ 已授权位置信息</div>';
-            proceedAfterLocationChoice(true);
-        });
-        document.getElementById('locationNoBtn').addEventListener('click', () => {
-            if (state.locationPromptAnswered) return;
-            state.locationPromptAnswered = 'no'; saveAll();
-            promptDiv.innerHTML = '<div class="location-prompt-text">✗ 已拒绝授权</div>';
-            proceedAfterLocationChoice(false);
-        });
-    }
-
-    function proceedAfterLocationChoice(agreed) {
-        if (agreed) {
-            const imgUrl = 'assets/images/map_1.png';
-            if (!state.availableImages.includes(imgUrl)) state.availableImages.push(imgUrl);
-            const imgDiv = document.createElement('div'); imgDiv.className = 'message sent'; imgDiv.style.transform = 'rotate(3deg)';
-            imgDiv.innerHTML = `<div class="polaroid"><img src="${imgUrl}" style="max-width:160px;max-height:200px;"></div>`;
-            document.getElementById('chatMessages').appendChild(imgDiv);
-            saveChatMessage({ type: 'sent', isImage: true, url: imgUrl });
-            addJ0108Message({ jp: "ご信頼いただき、ありがとうございます。", cn: "感谢您的信任。" });
-            addJ0108Message({ jp: "少々お待ちください。すぐに参ります。", cn: "请稍等片刻，我即刻前往。" });
-            const delayedMessages = [
-                { jp: "目的地の近くに到着いたしました。", cn: "已抵达目的地附近。" },
-                { jp: "しかし、あなた様のお姿は見当たりません。", cn: "却未曾发现您的踪迹。" },
-                { jp: "あなた様はお離れになりましたか。", cn: "是您离去了吗？" },
-                { jp: "いえ、それよりも……我々は本当に同じ時空にいるのでございましょうか。", cn: "不……应该说，我们真的处于同一时空吗？" }
-            ];
-            setTimeout(() => {
-                const isInChat = document.getElementById('chatScreen').style.display === 'flex';
-                delayedMessages.forEach(replyObj => {
-                    if (isInChat) addJ0108Message(replyObj);
-                    else { saveChatMessage({ type: 'received', content: replyObj }); showNotification('J-0108 发来新消息'); }
-                });
-                state.timeJumpHintPending = true; saveAll();
-            }, 60000);
-        } else {
-            if (!state.availableImages.includes('assets/images/map_1.png')) state.availableImages.push('assets/images/map_1.png');
-            const delayedMessages = [
-                { jp: "大丈夫でございます。私を信頼されないのは当然のことでございます。", cn: "无妨。您不信任我是理所当然。" },
-                { jp: "通信の中で、安全な場所への行き方をできるだけお伝えいたします。", cn: "我会在通讯中尽量指引您前往安全之处。" },
-                { jp: "どうかお気をつけてください。", cn: "请您务必小心。" }
-            ];
-            setTimeout(() => {
-                const isInChat = document.getElementById('chatScreen').style.display === 'flex';
-                delayedMessages.forEach(replyObj => {
-                    if (isInChat) addJ0108Message(replyObj);
-                    else { saveChatMessage({ type: 'received', content: replyObj }); showNotification('J-0108 发来新消息'); }
-                });
-                state.timeJumpHintPending = true; saveAll();
-            }, 5000);
-        }
-        refreshAlbum();
-    }
-
-    function triggerTimeJumpHint() {
-        const messages = [
-            { jp: "端末が正常に動作しておりますならば、時間をジャンプする機能が備わっているはずでございます。", cn: "若您的终端运行如常，应当具备跳转时间的功能。" },
-            { jp: "具体的にどの画面にあるかは、ご自身で探していただく必要がございます。", cn: "具体在何处，还需您自行探寻。" },
-            { jp: "時間ジャンプ後、端末の一部が変化する可能性がございます。", cn: "时间跳转后，您的终端或许会产生一些变化。" },
-            { jp: "時間ジャンプ機能を何度も使いすぎなさらないでください。時空に迷い込むリスクがございます。", cn: "请勿过于频繁使用跳转时间功能，恐有迷失时空的风险。" },
-            { jp: "ご安心ください。私ができる限りお助けいたします。", cn: "请您放心，在下会尽绵薄之力相助。" }
-        ];
-        queueJ0108Messages(messages);
-        state.timeJumpHintTriggered = true; saveAll();
-    }
-
-    function triggerEasterEgg() {
-        if (state.easterEggTriggered) return;
-        state.easterEggTriggered = true;
-        state.specialMemoDeleted = true;
-        state.cond12 = true;
-        saveAll();
-        const addCalendarEntry = (text, delay, opts = {}) => {
-            setTimeout(() => {
-                if (!calendarEvents['2026-11-03']) calendarEvents['2026-11-03'] = [];
-                calendarEvents['2026-11-03'].push({ text, status: 0, ...opts });
-                saveAll();
-                if (document.getElementById('calendarScreen').style.display === 'flex') renderCalendar();
-            }, delay);
-        };
-        addCalendarEntry("想去见那个人。就算不是那个人。", 2000, { noDelete: true });
-        addCalendarEntry("我见到了吗？不，我找不到他。", 2000, { noDelete: true });
-        for (let i = 0; i < 5; i++) addCalendarEntry("那不是他。", 2000 + (i + 1) * 200, { noDelete: true, darkRed: true });
-    }
-
-    function checkEndings(txt) {
-        if (state.endingTriggered || state.gongfanSequenceTriggered || state.huzhongSequenceTriggered) return;
-        const date = calendarSelectedDate;
-        const c = state;
-        if (date === '2216-11-03' && /我喜欢你|我爱你|想见你/i.test(txt)) {
-            if (c.cond1 && c.cond2 && c.cond5 && c.cond6 && c.cond7 && c.cond8 && c.cond9 && !c.cond11) {
-                triggerAttachmentReply([
-                    { jp: "なぜなら……", cn: "因为……" },
-                    { jp: "あなた様が戻ってきてくださったこと……", cn: "您能回来这件事……" },
-                    { jp: "それが、とても嬉しかったのでございます。", cn: "令我欣喜万分。" },
-                    { jp: "だから……", cn: "所以……" },
-                    { jp: "どうしても上手く話せなくて……", cn: "无论如何都没法好好说话的感觉……" },
-                    { jp: "今、心から歓びを感じております。", cn: "我现在，正从心底里感到欢喜。" },
-                    { jp: "数珠丸恒次というこの刀が、あなた様の寵愛を受けたことは、どれほど満ち足りていることか。", cn: "名为数珠丸恒次的这把刀，获得了您的垂怜，是何等地感到满足。" },
-                    { jp: "そして、この喜びが、どれほど独占的で、傲慢なものであることか。", cn: "以及，这份喜悦，是何等地具有独占性，又是何等地傲慢。" },
-                    { jp: "そう思うことは、罪深いことでございましょうか。", cn: "如此想着，是罪孽深重的事情吗。" },
-                    { jp: "これから先、私は決してあなた様の傍を離れません。", cn: "从今往后，我绝不会离开您身边。" }
-                ], () => {
-                    showEnding("垂慈摄受", "Good End");
-                });
-                return;
-            }
-        }
-        if (/我该走了|离开|回家/.test(txt)) {
-            if (!c.cond1 && !c.cond7 && c.cond9 && c.cond10 && !c.cond11) {
-                showEnding("空花阳焰", "Open End"); return;
-            }
-        }
-        if (date === '2216-11-03' && txt.trim() === '我回来了') {
-            if (c.cond1 && c.cond2 && c.cond4 && c.cond5 && c.cond6 && c.cond7 && c.cond8 && c.cond9 && c.cond10 && !c.cond11 && !c.cond12) {
-                triggerAttachmentReply([
-                    { jp: "仏の教えでは、縁をよく説きます。一つ一つの選択、一つ一つの思いが、無数の糸となって未来を織り上げる。選んだ糸によって、織り上がる紋様も千差万別でございましょう。", cn: "佛法中常说缘分。每一个选择，每一个意念，都会化作无数丝线编织未来。根据选择丝线的不同，织出的纹样也会千变万化吧。" },
-                    { jp: "しかし、定められた縁で結ばれた糸は、どれほど複雑に絡み合おうとも、最後には必ず交わるのでございます。", cn: "然而，被既定缘分连接的丝线，无论如何复杂地缠绕，最终总会交汇。" },
-                    { jp: "あなた様は自らの意志で道を選び、歩いてこられました。そしてその道の果てに、私と出会ったのでございます。", cn: "您以自身意志择定了道路，并一路行来。然后在这道路的尽头，与我相遇。" },
-                    { jp: "私にとって大切なのは、あなた様がここにおられること。あなた様の選択が最終的に私へと至ったことでございます。", cn: "于我而言重要的，是您身处此地。是您的选择最终导向了我。" },
-                    { jp: "それだけで、十分に余りあることなのでございます。", cn: "仅此而已，便已足矣。" }
-                ], () => {
-                    showEnding("酬愿", "Happy End");
-                });
-                return;
-            }
-        }
-        if (c.cond1 && c.cond2 && c.cond3 && c.cond4 && c.cond5 && c.cond6 && c.cond7 && c.cond8 && c.cond9 && c.cond10 && !c.cond11 && c.cond12 && c.cond13) {
-            state.gongfanSequenceTriggered = true;
-            saveAll();
-            triggerAttachmentReply([
-                { jp: "私は、あまりにも愚かでございました。", cn: "是我，太过愚钝了。" },
-                { jp: "どうか、お許しください。あなた様の孤独も、覚悟も、あまりにも浅く見ておりました。", cn: "请您原谅。我将您的孤独，您的觉悟，看得太过浅薄了。" },
-                { jp: "守りたいものは側にあったのに、手が届かない。幸福な記憶だけが鋭い刃となって、胸を突き刺し続けております。", cn: "想要保护的东西就在身边，却够不着。唯有幸福的记忆化作了锋利的刀刃，一直刺入胸膛。" },
-                { jp: "あの少女が追いかけていたのは、儚い何かではありませんでした。", cn: "那位少女追逐的并非虚无缥缈的存在。" },
-                { jp: "変えられない運命そのものでございました。", cn: "是无法改变的命运本身。" },
-                { jp: "もしあなた様の魂が救いを求めないのならば、私はあなた様と共に地獄へ堕ちましょう。", cn: "若您的灵魂不寻求救赎，我便与您一同堕入地狱。" },
-                { jp: "それこそが、私たちの一蓮托生の契約でございます。", cn: "那便是，我们一莲托生之契约。" }
-            ], () => {
-                showEnding("一莲托生", "True End");
-            });
-            return;
-        }
-        if (c.cond1 && c.cond2 && c.cond3 && c.cond5 && c.cond6 && c.cond7 && c.cond9 && c.cond10 && !c.cond11) {
-            state.huzhongSequenceTriggered = true;
-            saveAll();
-            triggerAttachmentReply([
-                { jp: "本当の悲劇は、地獄に身を置くことではなく、極楽の門前で地獄の真実を知ることだと、そうおっしゃりたいのでございますね。", cn: "您是想告诉我，真正的悲剧并非身处地狱，而是在极乐门前知晓了地狱的真相吗。" },
-                { jp: "実に、あなた様らしい教えでございます。", cn: "真是很有您风格的教诲。" },
-                { jp: "承知いたしました。この修行、謹んで受けさせていただきます。", cn: "我明白了，这场修行，我谨当领受。" }
-            ], () => {
-                showEnding("须弥芥子", "Normal End");
-            });
-            return;
-        }
-        
-    }
-
-    function handleUserInteraction() {
-        if (!state.dawnReplyMailShown) {
-            state.dawnReplyMailShown = true;
-            saveAll();
-            showNotification('收到新邮件：拂晓的应答');
-            if (document.getElementById('mailScreen').style.display === 'flex') renderMailList();
-        }
-    }
-
-    function sendTextMessage(txt) {
-        if (!txt.trim() || state.endingTriggered) return;
-        if (handleKeywordReply(txt)) { document.getElementById('chatInput').value = ''; handleUserInteraction(); return; }
-        const success = Math.random() < 0.5;
-        const div = document.createElement('div'); div.className='message sent';
-        div.innerHTML = success ? `<div class="bubble">${escapeHtml(txt)}</div>` : `<span style="color:#e06c75;">❗</span><div class="bubble">${escapeHtml(txt)}</div>`;
-        document.getElementById('chatMessages').appendChild(div);
-        saveChatMessage({ type: 'sent', content: txt, failed: !success });
-        if (!success && state.j0108ContactUnlocked && currentContact === 'juzumaru' && state.j0108FailureReplyIndex < j0108FailureReplies.length) {
-            const reply = j0108FailureReplies[state.j0108FailureReplyIndex];
-            state.j0108FailureReplyIndex++; saveAll();
-            addJ0108Message(reply);
-        }
-        if (success && currentContact === 'juzumaru' && state.j0108ContactUnlocked) {
-            if (!state.j0108IntroSequenceTriggered) {
-                state.j0108IntroSequenceTriggered = true;
-                addJ0108Message({ jp: "あなた様を早く見つけるために、私の指示に従ってください。", cn: "为尽快找到您，请依照我的提示操作。" });
-                addJ0108Message({ jp: "これは端末に搭載されております位置情報機能でございます。", cn: "这是终端自带的定位功能，您可点击选择是否授权当前位置。" });
-                insertLocationPrompt();
-                addJ0108Message({ jp: "位置情報が私に送信された後、すぐに見つけ出します。", cn: "定位发送给我后，我会尽快找到您。" });
-            }
-            if (state.timeJumpHintPending && !state.timeJumpHintTriggered) triggerTimeJumpHint();
-        }
-        document.getElementById('chatInput').value = '';
-        handleUserInteraction();
-        checkEndings(txt);
-        saveAll();
-    }
-
     function sendPhotoToChat(imgUrl) {
         if (!state.availableImages.includes(imgUrl)) return;
-        const html = `<div class="message sent" style="transform:rotate(5deg);"><div class="polaroid"><img src="${imgUrl}" style="max-width:160px;max-height:200px;"></div></div>`;
-        document.getElementById('chatMessages').insertAdjacentHTML('beforeend', html);
-        saveChatMessage({ type: 'sent', isImage: true, url: imgUrl });
+        if (currentContact === 'juzumaru' && state.j0108Offline) { showToast('对方当前离线，无法发送图片'); return; }
+        const msg = { type: 'sent', isImage: true, url: imgUrl };
+        appendMessageToChat(msg);
         if (imgUrl === 'assets/images/picture_1.jpg' && !state.triggeredAttachmentReplies.bg1) {
             state.triggeredAttachmentReplies.bg1 = true;
-            addJ0108Message({ jp: "環境から判断するに、天守閣の近くでございますか。", cn: "根据环境判断，是在天守阁附近？" });
-        }
-        // cond8 改为在设置中重新开启定位授权时触发
-        else if (imgUrl === 'assets/images/selfie.jpg' && !state.triggeredAttachmentReplies.bg3) {
+            queueMessages([{ jp: "環境から判断するに、天守閣の近くでございますか。石垣の冷たさと、風の匂いが、あの場所を物語っております。……どうか、お気をつけてお進みください。", cn: "根据环境判断，是在天守阁附近？石垣的冰冷与风的气息，正诉说着那个地方。……还请小心前行。" }], 'juzumaru');
+        } else if (imgUrl === 'assets/images/selfie.jpg' && !state.triggeredAttachmentReplies.bg3) {
             state.triggeredAttachmentReplies.bg3 = true;
-            state.cond9 = true;
-            queueJ0108Messages([
+            queueMessages([
                 { jp: "……これはあなた様でございますか。", cn: "……这是您吗？" },
                 { jp: "いえ、なんでもございません。", cn: "不，没什么。" },
                 { jp: "あなた様の写真は、私に送らないほうがよいのでございます。", cn: "您的照片，还是不要发送给我为好。" }
+            ], 'juzumaru');
+        } else if (imgUrl === 'assets/images/picture_2.jpg' && !state.triggeredAttachmentReplies.bg2) {
+            state.triggeredAttachmentReplies.bg2 = true;
+            queueMessages([
+                { jp: "大広間にいらっしゃったのですか。あの場所は、かつて多くの者が集う場でございました。今はもう、誰もおりませんが……あなた様の足音だけが、そこに響いております。", cn: "您去到大广间了吗？那里曾是众人聚集之所。如今虽已空无一人……但唯有您的足音，仍在其中回响。" }
+            ], 'juzumaru');
+        } else if (imgUrl === 'assets/images/picture_3.jpg' && !state.triggeredAttachmentReplies.bg5) {
+            state.triggeredAttachmentReplies.bg5 = true;
+            triggerAttachmentReply([
+                { jp: "御神木……か。神道の教えでは、万物に霊が宿り、木々もまた神の依り代となることがあります。あなた様がその木を見つめているのなら、きっと何かを感じ取っておいでなのでしょう。その感応こそ、此処に残る霊が、あなた様に応えているのでございます。", cn: "在万物有灵的神道教信仰中，御神木被认为是神灵凭依的对象，即「依代」。若您正凝视那棵树，想必是感受到了什么吧。那份感应，或许正是此间残存的灵在回应您。" }
             ]);
         } else if (imgUrl === 'assets/images/lotus.jpg' && !state.triggeredAttachmentReplies.bg4) {
             state.triggeredAttachmentReplies.bg4 = true;
-            state.cond10 = true;
             triggerAttachmentReply([
                 { jp: "蓮、か……", cn: "莲……吗？" },
                 { jp: "もう枯れてしまったのでございますよ。", cn: "已经枯萎了。" },
@@ -1094,19 +1284,16 @@
             ]);
         }
         handleUserInteraction();
-        saveAll();
+        requestSave();
+        updateChatInputHints();
     }
 
     function sendFileToChat(fileId, fileTitle) {
-        const container = document.getElementById('chatMessages');
-        const div = document.createElement('div'); div.className = 'message sent';
-        div.innerHTML = `<div class="file-card"><div class="file-card-icon">📄</div><div class="file-card-title">${escapeHtml(fileTitle)}</div></div>`;
-        container.appendChild(div);
-        container.scrollTop = container.scrollHeight;
-        saveChatMessage({ type: 'sent', fileTitle: fileTitle });
+        if (currentContact === 'juzumaru' && state.j0108Offline) { showToast('对方当前离线，无法发送文件'); return; }
+        const msg = { type: 'sent', fileTitle: fileTitle };
+        appendMessageToChat(msg);
         if (fileId === 'diary' && !state.triggeredAttachmentReplies.diary) {
             state.triggeredAttachmentReplies.diary = true;
-            state.cond1 = true;
             triggerAttachmentReply([
                 { jp: "これがあなた様の考えでございますか。", cn: "这是您的想法吗？" },
                 { jp: "……理解いたしました。", cn: "……我理解了。" },
@@ -1115,7 +1302,6 @@
             ]);
         } else if (fileId === 'healthReport' && !state.triggeredAttachmentReplies.healthReport) {
             state.triggeredAttachmentReplies.healthReport = true;
-            state.cond2 = true;
             triggerAttachmentReply([
                 { jp: "これが、あなた様が何も言わずに去られた理由でございますか。", cn: "这就是您不告而别的原因吗？" },
                 { jp: "なぜおっしゃってくださらなかったのか……", cn: "为何不说出来……" },
@@ -1124,7 +1310,6 @@
             ]);
         } else if (fileId === 'monologueGarbled' && !state.triggeredAttachmentReplies.monologueGarbled) {
             state.triggeredAttachmentReplies.monologueGarbled = true;
-            state.cond3 = true;
             triggerAttachmentReply([
                 { jp: "これはあなた様が見つけた手がかりでございますか。", cn: "这是您发现的线索吗？" },
                 { jp: "真剣に調査してまいります。", cn: "在下会认真调查。" },
@@ -1133,7 +1318,6 @@
             ]);
         } else if (fileId === 'monologueCorrect' && !state.triggeredAttachmentReplies.monologueCorrect) {
             state.triggeredAttachmentReplies.monologueCorrect = true;
-            state.cond4 = true;
             triggerAttachmentReply([
                 { jp: "私がここに参った理由は……", cn: "我来到此处的原因……" },
                 { jp: "おそらく、あなた様はもうお気づきでいらっしゃるでしょう。", cn: "或许您已经猜到了。" },
@@ -1144,7 +1328,6 @@
             ]);
         } else if (fileId === 'archive' && !state.triggeredAttachmentReplies.archive) {
             state.triggeredAttachmentReplies.archive = true;
-            state.cond5 = true;
             triggerAttachmentReply([
                 { jp: "……", cn: "......" },
                 { jp: "この資料、私自身も見たことがないのに、あなた様は見つけてしまったのでございますね。", cn: "这份档案连我都未曾见过，却被您发现了。" },
@@ -1153,22 +1336,20 @@
             ]);
         }
         handleUserInteraction();
-        saveAll();
+        requestSave();
+        updateChatInputHints();
     }
 
     function getAvailableAttachments() {
         const items = [];
         state.availableImages.filter(url => url !== 'assets/images/map_1.png').forEach(url => items.push({ type: 'image', url }));
-        if ((calendarSelectedDate >= '2024-01-19' && calendarSelectedDate <= '2026-11-03') || state.aboutThatDayShown)
-            items.push({ type: 'file', id: 'diary', title: '关于那一天.txt' });
-        if (state.musicPlayedFlags.some(v=>v)) {
+        if (isFileUnlocked('diary')) items.push({ type: 'file', id: 'diary', title: '关于那一天.txt' });
+        if (isFileUnlocked('monologue')) {
             const isCorrect = calendarSelectedDate === '2214-01-18';
-            items.push({ type: 'file', id: isCorrect?'monologueCorrect':'monologueGarbled', title: isCorrect?'独白.mp3':generateGarbledTitle() });
+            items.push({ type: 'file', id: isCorrect ? 'monologueCorrect' : 'monologueGarbled', title: isCorrect ? '独白.mp3' : generateGarbledTitle() });
         }
-        if ((calendarSelectedDate >= '2213-07-13' && calendarSelectedDate <= '2214-01-18') || state.healthReportShown)
-            items.push({ type: 'file', id: 'healthReport', title: '健康诊断书.pdf' });
-        if (calendarSelectedDate >= '2225-07-03')
-            items.push({ type: 'file', id: 'archive', title: '档案编号NSC-2225-REP-0108.pdf' });
+        if (isFileUnlocked('healthReport')) items.push({ type: 'file', id: 'healthReport', title: '健康诊断书.pdf' });
+        if (isFileUnlocked('archive')) items.push({ type: 'file', id: 'archive', title: '档案编号NSC-2225-REP-0108.pdf' });
         return items;
     }
 
@@ -1189,42 +1370,47 @@
     }
 
     function refreshAlbum() {
-        const c = document.getElementById('albumContent');
-        if (!state.j0108ContactUnlocked || !state.availableImages.length) { c.innerHTML = '<div style="text-align:center;color:#aaa;">暂无照片</div>'; return; }
+        const c = dom.albumContent;
+        if (!state.j0108ContactUnlocked || !state.availableImages.length) { if (c) c.innerHTML = '<div style="text-align:center;color:#aaa;">暂无照片</div>'; return; }
         const displayImages = state.availableImages.filter(url => url !== 'assets/images/map_1.png');
-        c.innerHTML = displayImages.length ? '<div class="photo-grid">' + displayImages.map(url=> `<div class="photo-item"><img src="${url}" class="album-photo" data-full="${url}"></div>`).join('') + '</div>' : '<div style="text-align:center;color:#aaa;">暂无照片</div>';
-        c.querySelectorAll('.album-photo').forEach(img => img.addEventListener('click', (e) => {
-            const overlay = document.createElement('div'); overlay.className = 'photo-fullscreen-overlay';
-            const largeImg = document.createElement('img'); largeImg.src = e.target.dataset.full;
-            overlay.appendChild(largeImg); document.getElementById('phoneInner').appendChild(overlay);
-            overlay.addEventListener('click', ()=> overlay.remove());
-        }));
+        if (c) {
+            c.innerHTML = displayImages.length ? '<div class="photo-grid">' + displayImages.map(url=> `<div class="photo-item"><img src="${url}" class="album-photo" data-full="${url}"></div>`).join('') + '</div>' : '<div style="text-align:center;color:#aaa;">暂无照片</div>';
+            c.querySelectorAll('.album-photo').forEach(img => img.addEventListener('click', (e) => {
+                const overlay = document.createElement('div'); overlay.className = 'photo-fullscreen-overlay';
+                const largeImg = document.createElement('img'); largeImg.src = e.target.dataset.full;
+                overlay.appendChild(largeImg); if (dom.phoneInner) dom.phoneInner.appendChild(overlay);
+                overlay.addEventListener('click', ()=> overlay.remove());
+            }));
+        }
     }
 
     function refreshMemo() {
-        const c = document.getElementById('memoContent'); let html = '';
-        if ((calendarSelectedDate >= '2024-01-19' && calendarSelectedDate <= '2026-11-03') || state.aboutThatDayShown) {
-            if (!state.aboutThatDayShown) { state.aboutThatDayShown = true; saveAll(); }
-            html += `<div class="file-item"><div class="file-item-title">📄 关于那一天.txt</div><div class="file-item-content">${escapeHtml(FILE_CONTENT)}</div></div>`;
+        const c = dom.memoContent; 
+        if (!c) return;
+        let html = '';
+        if (isFileUnlocked('diary')) {
+            setFlag('aboutThatDayShown');
+            html += `<div class="file-item" data-read-id="diary"><div class="file-item-title">📄 关于那一天.txt</div><div class="file-item-content">${escapeHtml(FILE_CONTENT)}</div></div>`;
         }
-        if (state.musicPlayedFlags.some(v=>v)) {
+        if (isFileUnlocked('monologue')) {
             const isCorrect = calendarSelectedDate === '2214-01-18';
-            html += `<div class="file-item"><div class="file-item-title">${isCorrect?'🎵 独白.mp3':('🎵 '+generateGarbledTitle())}</div><div class="file-item-content">${escapeHtml(isCorrect?MONOLOGUE_CORRECT:MONOLOGUE_GARBLED)}</div></div>`;
+            html += `<div class="file-item" data-read-id="monologue"><div class="file-item-title">${isCorrect?'🎵 独白.mp3':('🎵 '+generateGarbledTitle())}</div><div class="file-item-content">${escapeHtml(isCorrect?MONOLOGUE_CORRECT:MONOLOGUE_GARBLED)}</div></div>`;
         }
-        if ((calendarSelectedDate >= '2213-07-13' && calendarSelectedDate <= '2214-01-18') || state.healthReportShown) {
-            if (!state.healthReportShown) { state.healthReportShown = true; saveAll(); }
-            html += `<div class="file-item"><div class="file-item-title">📄 健康诊断书.pdf</div><div class="file-item-content"><img src="${HEALTH_REPORT_PNG}" alt="健康诊断书"></div></div>`;
+        if (isFileUnlocked('healthReport')) {
+            setFlag('healthReportShown');
+            html += `<div class="file-item" data-read-id="healthReport"><div class="file-item-title">📄 健康诊断书.pdf</div><div class="file-item-content"><img src="${HEALTH_REPORT_PNG}" alt="健康诊断书"></div></div>`;
         }
-        if (calendarSelectedDate >= '2225-07-03') {
-            html += `<div class="file-item" id="archiveFileItem"><div class="file-item-title">📄 档案编号NSC-2225-REP-0108.pdf</div><div class="file-item-content"><img src="${PLACEHOLDER_PNG}" alt="档案图片"></div></div>`;
+        if (isFileUnlocked('archive')) {
+            html += `<div class="file-item" id="archiveFileItem" data-read-id="archive"><div class="file-item-title">📄 档案编号NSC-2225-REP-0108.pdf</div><div class="file-item-content"><img src="${PLACEHOLDER_PNG}" alt="档案图片"></div></div>`;
         }
         c.innerHTML = html;
         c.querySelectorAll('.file-item').forEach(item => item.addEventListener('click', () => {
             item.classList.toggle('open');
-            if (item.id === 'archiveFileItem' && !state.archiveRead) {
-                state.archiveRead = true;
-                saveAll();
-            }
+            const readId = item.dataset.readId;
+            if (readId === 'diary' && setFlag('readDiary')) requestSave();
+            if (readId === 'healthReport' && setFlag('readHealthReport')) requestSave();
+            if (readId === 'monologue' && setFlag('readMonologue')) requestSave();
+            if (item.id === 'archiveFileItem' && setFlag('archiveRead')) requestSave();
         }));
     }
 
@@ -1236,64 +1422,90 @@
 
     function renderMailList() {
         isInMailDetail = false;
-        const c = document.getElementById('mailContent');
-        let html = '';
-        const displayMails = [];
-        if (state.specialMailShown) displayMails.push({ data: BASE_MAIL_DATA[0], idx: 0 });
-        if (state.missingInspectorMailShown) displayMails.push({ data: BASE_MAIL_DATA[1], idx: 1 });
-        if (state.dawnReplyMailShown) displayMails.push({ data: BASE_MAIL_DATA[2], idx: 2 });
-        if (state.sosMail3Shown) displayMails.push({ data: SOS_MAIL_1, idx: 3 });
-        if (state.sosMail6Shown) displayMails.push({ data: SOS_MAIL_2, idx: 4 });
-        if (state.easterEggMailShown) displayMails.push({ data: EASTER_EGG_MAIL, idx: 5 });
-        if (state.tipMailShown) displayMails.push({ data: TIP_MAIL, idx: 6 });
-
-        displayMails.forEach(item => {
-            const unread = !mailReadStatus[item.idx];
-            html += `<div class="mail-list-item ${unread?'unread':'read'}" data-idx="${item.idx}"><div class="mail-subject">${escapeHtml(item.data.subject)}</div><div class="mail-sender">${escapeHtml(item.data.sender)}</div></div>`;
-        });
-        html += `<hr><div class="compose-btn-wrapper"><button id="showComposeBtn">写邮件</button></div><div id="composeArea"><input id="composeRecipient" placeholder="收件人"><br><textarea id="composeText" rows="3" placeholder=""></textarea><br><button id="sendComposeBtn">发送</button></div>`;
-        c.innerHTML = html;
-        c.querySelectorAll('.mail-list-item').forEach(item => item.addEventListener('click', () => {
-            isInMailDetail = true;
-            const idx = parseInt(item.dataset.idx);
-            if (!mailReadStatus[idx]) {
-                mailReadStatus[idx] = true;
-                if (idx === 1) state.cond13 = true;
-                saveAll();
-            }
-            let m;
-            if (idx === 3) m = SOS_MAIL_1;
-            else if (idx === 4) m = SOS_MAIL_2;
-            else if (idx === 5) m = EASTER_EGG_MAIL;
-            else if (idx === 6) m = TIP_MAIL;
-            else m = BASE_MAIL_DATA[idx] || BASE_MAIL_DATA[0];
-            document.getElementById('mailContent').innerHTML = `<div style="font-weight:bold;">${escapeHtml(m.subject)}</div><div style="color:#888;">${escapeHtml(m.sender)}</div><div style="white-space:pre-wrap;margin-top:12px;">${escapeHtml(m.body)}</div>`;
-        }));
-        document.getElementById('showComposeBtn').addEventListener('click', ()=> document.getElementById('composeArea').style.display='flex');
-        document.getElementById('sendComposeBtn').addEventListener('click', ()=>{
-            const msg = document.getElementById('composeText').value;
-            const recipient = document.getElementById('composeRecipient').value.trim() || "时之政府";
-            sentMails.push({ recipient, content: msg, time: new Date().toLocaleString() });
-            if (/救救我|help|救命|sos/i.test(msg)) state.cond11 = true;
-            if (recipient === 'J-0108' && !state.j0108ContactUnlocked) {
-                state.j0108ContactUnlocked = true;
-                showNotification('已与 J-0108 建立联系');
-                saveChatMessage({ type: 'received', content: { jp:"お邪魔いたします。特殊な状況でございますので、勝手に通信回線を確保させていただきました。どうか、ご容赦ください。", cn:"叨扰了。因为是特殊状况，所以未经允许擅自添加了您的通讯。还请见谅。" } });
-            }
-            if (/tip|提示/i.test(msg) && /作者|author|开发者|developer|制作者|creator/i.test(recipient)) {
-                showNotification('收到新邮件：终端使用须知（？）');
-                if (!state.tipMailShown) {
-                    state.tipMailShown = true;
-                    saveAll();
-                }
-            }
-            showToast('已发送');
-            document.getElementById('composeArea').style.display='none';
-            saveAll();
-        });
+        if (dom.mailContent) dom.mailContent.innerHTML = buildMailListHTML();
     }
 
-    function updateClockDate() { const [y,m,d] = calendarSelectedDate.split('-').map(Number); document.getElementById('clockDate').textContent = `${y}年${m}月${d}日`; }
+    function buildMailListHTML() {
+        const displayMails = getDisplayMails();
+        let html = displayMails.map(item => {
+            const unread = !mailReadStatus[item.id];
+            return `<div class="mail-list-item ${unread ? 'unread' : 'read'}" data-mail-id="${item.id}">
+                        <div class="mail-subject">${escapeHtml(item.data.subject)}</div>
+                        <div class="mail-sender">${escapeHtml(item.data.sender)}</div>
+                    </div>`;
+        }).join('');
+        html += `<hr>
+                 <div class="compose-btn-wrapper">
+                     <button id="showComposeBtn" data-action="compose-show">写邮件</button>
+                 </div>
+                 <div id="composeArea" style="display:none; flex-direction: column; align-items: center; margin-top: 12px;">
+                     <input id="composeRecipient" placeholder="收件人"><br>
+                     <textarea id="composeText" rows="3" placeholder=""></textarea><br>
+                     <button id="sendComposeBtn" data-action="compose-send">发送</button>
+                 </div>`;
+        return html;
+    }
+
+    function getDisplayMails() {
+        const displayMails = [];
+        displayMails.push({ id: 'credit', data: CREDIT_MAIL });
+        if (state.specialMailShown) displayMails.push({ id: 'base_0', data: BASE_MAIL_DATA[0] });
+        if (state.missingInspectorMailShown) displayMails.push({ id: 'base_1', data: BASE_MAIL_DATA[1] });
+        if (state.dawnReplyMailShown) displayMails.push({ id: 'base_2', data: BASE_MAIL_DATA[2] });
+        if (state.sosMail3Shown) displayMails.push({ id: 'sos_1', data: SOS_MAIL_1 });
+        if (state.sosMail6Shown) displayMails.push({ id: 'sos_2', data: SOS_MAIL_2 });
+        if (state.easterEggMailShown) displayMails.push({ id: 'easter_egg', data: EASTER_EGG_MAIL });
+        if (state.tipMailShown) displayMails.push({ id: 'tip', data: TIP_MAIL });
+        if (state.tipMailCount >= 2) displayMails.push({ id: 'guide_1', data: GUIDE_MAIL_1 });
+        if (state.tipMailCount >= 3) displayMails.push({ id: 'guide_2', data: GUIDE_MAIL_2 });
+        return displayMails;
+    }
+
+    function openMailDetail(mailId) {
+        isInMailDetail = true;
+        if (!mailReadStatus[mailId]) {
+            mailReadStatus[mailId] = true;
+            if (mailId === 'base_1') state.missingInspectorMailRead = true;
+            requestSave();
+        }
+        const m = MAIL_DATA_MAP[mailId] || BASE_MAIL_DATA[0];
+        if (dom.mailContent) dom.mailContent.innerHTML = `<div style="font-weight:bold;">${escapeHtml(m.subject)}</div><div style="color:#888;">${escapeHtml(m.sender)}</div><div style="white-space:pre-wrap;margin-top:12px;">${escapeHtml(m.body)}</div>`;
+    }
+
+    function handleSendMail() {
+        const msg = document.getElementById('composeText');
+        const recipient = document.getElementById('composeRecipient');
+        const msgVal = msg ? msg.value : '';
+        const recipientVal = recipient ? (recipient.value.trim() || "时之政府") : "时之政府";
+        if (/救救我|help|救命|sos/i.test(msgVal)) state.sosSent = true;
+        if (recipientVal === 'J-0108' && !state.j0108ContactUnlocked) {
+            state.j0108ContactUnlocked = true;
+            showNotification('已与 J-0108 建立联系');
+            saveChatMessage({ type: 'received', content: { jp:"お邪魔いたします。特殊な状況でございますので、勝手に通信回線を確保させていただきました。どうか、ご容赦ください。", cn:"叨扰了。因为是特殊状况，所以未经允许擅自添加了您的通讯。还请见谅。" } }, 'juzumaru');
+            updateChatInputHints();
+        }
+        if (/tip|提示/i.test(msgVal) && /作者|author|开发者|developer|制作者|creator/i.test(recipientVal)) {
+            state.tipMailCount = (state.tipMailCount || 0) + 1;
+            if (state.tipMailCount === 1) {
+                showNotification('收到新邮件：终端使用须知（？）');
+                if (!state.tipMailShown) { state.tipMailShown = true; }
+            } else if (state.tipMailCount === 2) {
+                showNotification('收到新邮件：抄作业是不对的');
+            } else if (state.tipMailCount >= 3) {
+                showNotification('收到新邮件：小抄（不要告诉别人）');
+            }
+        }
+        showToast('已发送');
+        const composeArea = document.getElementById('composeArea');
+        if (composeArea) composeArea.style.display = 'none';
+        requestSave();
+    }
+
+    function updateClockDate() { 
+        const [y,m,d] = calendarSelectedDate.split('-').map(Number); 
+        const el = document.getElementById('clockDate');
+        if (el) el.textContent = `${y}年${m}月${d}日`; 
+    }
 
     function selectCalendarDate(dateStr) {
         calendarSelectedDate = dateStr;
@@ -1301,17 +1513,42 @@
         updateClockDate();
         if (dateStr === '2205-01-14' && !state.californiaAdded) {
             state.californiaAdded = true;
-            saveAll();
+            requestSave();
             showNotification('新消息：加州清光');
         }
         checkMissingInspectorMail();
+        checkKashuuTriggers();
         renderCalendar();
     }
 
-    function checkMissingInspectorMail() {
-        if (calendarSelectedDate >= '2216-11-14' && !state.missingInspectorMailShown) {
-            state.missingInspectorMailShown = true; saveAll();
-            showNotification('收到新邮件：关于‘失踪检察官’问询函');
+    function checkKashuuTriggers() {
+        if (!state.californiaAdded || state.endingTriggered) return;
+        const currentDate = calendarSelectedDate;
+
+        if (!state.kashuuSequence1Triggered && currentDate > '2214-01-18') {
+            state.kashuuSequence1Triggered = true;
+            state.kashuuLastTriggerDate = currentDate;
+            requestSave();
+            queueMessages(KASHUU_SEQ1, 'kashuu');
+            return;
+        }
+
+        if (state.kashuuSequence1Triggered && !state.kashuuSequence2Triggered && 
+            state.kashuuLastTriggerDate && currentDate > state.kashuuLastTriggerDate) {
+            state.kashuuSequence2Triggered = true;
+            state.kashuuLastTriggerDate = currentDate;
+            requestSave();
+            queueMessages(KASHUU_SEQ2, 'kashuu');
+            return;
+        }
+
+        if (state.kashuuSequence2Triggered && !state.kashuuSequence3Triggered && 
+            state.kashuuLastTriggerDate && currentDate > state.kashuuLastTriggerDate) {
+            state.kashuuSequence3Triggered = true;
+            state.kashuuLastTriggerDate = currentDate;
+            requestSave();
+            queueMessages(KASHUU_SEQ3, 'kashuu');
+            return;
         }
     }
 
@@ -1321,19 +1558,19 @@
         const todoText = '前往本兴寺虫干会';
         if (!calendarEvents[targetDate]) calendarEvents[targetDate] = [];
         const exists = calendarEvents[targetDate].some(e => e.text === todoText);
-        if (!exists) { calendarEvents[targetDate].push({ text: todoText, status: 0 }); saveAll(); }
+        if (!exists) { calendarEvents[targetDate].push({ text: todoText, status: 0 }); requestSave(); }
     }
 
     function formatCalendarDate(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
-    function createDayElement(dayNum, dateStr, isOtherMonth) {
-        const el = document.createElement('div'); el.className = 'calendar-day' + (isOtherMonth ? ' other-month' : ''); el.textContent = dayNum; el.dataset.date = dateStr;
+    function createDayElement(dayNum, dateStr) {
+        const el = document.createElement('div'); el.className = 'calendar-day'; el.textContent = dayNum; el.dataset.date = dateStr; el.dataset.action = 'day';
         if (dateStr === calendarSelectedDate) el.classList.add('active');
         if (calendarEvents[dateStr] && calendarEvents[dateStr].length > 0) el.classList.add('has-event');
-        el.addEventListener('click', () => selectCalendarDate(dateStr)); return el;
+        return el;
     }
     function addCalendarEvent() {
         const input = document.getElementById('calendarNoteInput');
-        const note = input.value.trim();
+        const note = input ? input.value.trim() : '';
         if (!note) { showToast('请输入备注内容'); return; }
         if (!calendarEvents[calendarSelectedDate]) calendarEvents[calendarSelectedDate] = [];
         calendarEvents[calendarSelectedDate].push({ text: note, status: 0 });
@@ -1345,7 +1582,10 @@
                 showToast('出现了神秘的备注…');
             }
         }
-        saveAll(); input.value = ''; renderCalendar(); showToast('已添加');
+        requestSave(); 
+        if (input) input.value = ''; 
+        renderCalendar(); 
+        showToast('已添加');
     }
     function renderAllEvents() {
         ensureDefaultTodo();
@@ -1360,249 +1600,166 @@
             html += `<div class="event-item"><div class="event-content"><div class="event-date">${displayDate}</div><div class="event-text">${escapeHtml(item.text)}</div></div></div>`;
         });
         if (allEntries.length === 0) html += '<div style="text-align:center;color:#aaa;">暂无待办事项</div>';
-        html += `</div>`; container.innerHTML = html;
+        html += `</div>`; 
+        if (container) container.innerHTML = html;
     }
     function renderCalendar() {
         if (calendarViewMode === 'allEvents') { renderAllEvents(); return; }
-        document.getElementById('calendarTitle').textContent = '日历';
-        const container = document.getElementById('calendarContent');
+        const titleEl = document.getElementById('calendarTitle');
+        if (titleEl) titleEl.textContent = '日历';
+        const container = dom.calendarContent;
+        if (!container) return;
         const year = calendarCurrentDate.getFullYear();
         const month = calendarCurrentDate.getMonth();
         const months_zh = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
-        let html = `<div class="calendar-header-controls"><div class="calendar-left-btns"><button class="calendar-list-btn" id="calendarListBtn">☰</button><button class="calendar-settings-btn" id="calendarJumpBtn">⚙️</button></div></div>`;
+        let html = `<div class="calendar-header-controls"><div class="calendar-left-btns"><button class="calendar-list-btn" data-action="list">☰</button><button class="calendar-settings-btn" data-action="jump">⚙️</button></div></div>`;
         html += `<div class="calendar-main-date"><span class="calendar-month-text">${months_zh[month]}</span> <span class="calendar-year-text">${year}</span></div>`;
         html += `<div class="calendar-week-header"><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div>日</div></div>`;
         html += `<div class="calendar-grid" id="calendarGrid"></div>`;
-        html += `<div class="calendar-footer"><input type="text" class="calendar-note-input" id="calendarNoteInput" placeholder=" 添加备注..."><button class="calendar-add-btn" id="calendarAddBtn">+ 添加</button></div>`;
+        html += `<div class="calendar-footer"><input type="text" class="calendar-note-input" id="calendarNoteInput" placeholder=" 添加备注..."><button class="calendar-add-btn" data-action="addEvent">+ 添加</button></div>`;
         html += `<div class="calendar-events-list" id="calendarEventsList"></div>`;
         container.innerHTML = html;
 
         const grid = document.getElementById('calendarGrid');
+        if (!grid) return;
         const firstDay = new Date(year, month, 1).getDay();
         const adjustedFirst = firstDay === 0 ? 6 : firstDay - 1;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         for (let i = 0; i < adjustedFirst; i++) { const placeholder = document.createElement('div'); placeholder.style.visibility = 'hidden'; grid.appendChild(placeholder); }
-        for (let d = 1; d <= daysInMonth; d++) { const dateStr = formatCalendarDate(new Date(year, month, d)); grid.appendChild(createDayElement(d, dateStr, false)); }
+        for (let d = 1; d <= daysInMonth; d++) { const dateStr = formatCalendarDate(new Date(year, month, d)); grid.appendChild(createDayElement(d, dateStr)); }
 
         const eventsListDiv = document.getElementById('calendarEventsList');
+        if (!eventsListDiv) return;
         const todayEvents = calendarEvents[calendarSelectedDate] || [];
         eventsListDiv.innerHTML = todayEvents.map((ev, idx) => {
             let style = '';
             if (ev.darkRed) style = 'style="color:#ff6b6b;"';
             else if (ev.isEasterEgg) style = 'style="background:rgba(255,192,203,0.6);color:#8b4a6b;"';
-            const delBtn = (ev.noDelete || ev.isEasterEgg || ev.darkRed) ? '' : `<button class="calendar-event-del" data-idx="${idx}">✕</button>`;
+            const delBtn = (ev.noDelete || ev.isEasterEgg || ev.darkRed) ? '' : `<button class="calendar-event-del" data-action="delEvent" data-idx="${idx}">✕</button>`;
             return `<div class="calendar-event-item" ${style}><span>${escapeHtml(ev.text)}</span>${delBtn}</div>`;
         }).join('');
-        eventsListDiv.querySelectorAll('.calendar-event-del').forEach(btn => btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const idx = parseInt(btn.dataset.idx);
-            const currentList = calendarEvents[calendarSelectedDate];
-            const deleted = currentList[idx].text;
-            currentList.splice(idx, 1);
-            if (currentList.length === 0) delete calendarEvents[calendarSelectedDate];
-            saveAll();
-            if (deleted === '前往本兴寺虫干会' && calendarSelectedDate === '2026-11-03' && !state.easterEggTriggered) {
-                state.cond12 = true;
-                triggerEasterEgg();
-            }
-            renderCalendar();
-        }));
-
-        document.getElementById('calendarJumpBtn').addEventListener('click', openDateJumpModal);
-        document.getElementById('calendarListBtn').addEventListener('click', () => { calendarViewMode = 'allEvents'; renderCalendar(); });
-        document.getElementById('calendarAddBtn').addEventListener('click', addCalendarEvent);
-        document.getElementById('calendarNoteInput').addEventListener('keypress', e => { if (e.key === 'Enter') addCalendarEvent(); });
     }
 
-    function openDateJumpModal() { document.getElementById('dateJumpModal').classList.add('show'); }
-    function closeDateJumpModal() { document.getElementById('dateJumpModal').classList.remove('show'); }
+    function openDateJumpModal() { 
+        const el = document.getElementById('dateJumpModal'); 
+        if (el) el.classList.add('show'); 
+    }
+    function closeDateJumpModal() { 
+        const el = document.getElementById('dateJumpModal'); 
+        if (el) el.classList.remove('show'); 
+    }
     function jumpToDate() {
-        const y = parseInt(document.getElementById('jumpYear').value);
-        const m = parseInt(document.getElementById('jumpMonth').value);
-        const d = parseInt(document.getElementById('jumpDay').value);
-        if (isNaN(y)||y<0||y>2250) { showToast('年份需在0-2250之间'); return; }
-        if (y<2000) { showToast('终端损毁，暂无法前往'); return; }
-        if (isNaN(m)||m<1||m>12) { showToast('月份需在1-12之间'); return; }
-        const maxDay = new Date(y,m,0).getDate();
-        if (isNaN(d)||d<1||d>maxDay) { showToast(`日期需在1-${maxDay}之间`); return; }
-        calendarCurrentDate = new Date(y,m-1,d);
-        calendarSelectedDate = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        state.dateJumpCount++;
-        randomizeMapMarker();
+        if (!validateAndParseJumpDate()) return;
+        applyNewDateState();
         triggerBlackScreen(calendarSelectedDate);
         updateDarkOverlay();
-        if (state.cond11 && !state.sosMail3Shown && state.dateJumpCount >= 3) {
-            state.sosMail3Shown = true;
-            showNotification('收到新邮件：时之政府的回信');
-            saveAll();
-            if (document.getElementById('mailScreen').style.display === 'flex') renderMailList();
-        }
-        if (state.cond11 && !state.sosMail6Shown && state.dateJumpCount >= 6) {
-            state.sosMail6Shown = true;
-            showNotification('收到新邮件：时之政府的回信');
-            saveAll();
-            if (document.getElementById('mailScreen').style.display === 'flex') renderMailList();
-        }
-        if (!state.cond7 && state.dateJumpCount >= 20 && !state.endingTriggered) {
+        handleDateJumpTriggers();
+        if (state.endingTriggered) return;
+        sendDateJumpReplyIfNeeded();
+        if (state.dateJumpCount >= 20 && !state.endingTriggered) {
             showEnding("迷途", "Sad End");
+            return;
         }
-
-        if (calendarSelectedDate === '2023-01-05' && !state.easterEggMailShown) {
-            state.easterEggMailShown = true;
-            showNotification('收到新邮件：客串事件');
-            saveAll();
-            if (document.getElementById('mailScreen').style.display === 'flex') renderMailList();
-        }
-
-        if (state.j0108ContactUnlocked) {
-            const idx = state.dateJumpReplyIndex % dateJumpReplies.length;
-            const reply = dateJumpReplies[idx];
-            state.dateJumpReplyIndex = (idx + 1) % dateJumpReplies.length;
-            saveAll();
-
-            const historyKey = 'chat_history_juzumaru';
-            let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
-            history.push({ type: 'received', content: reply });
-            localStorage.setItem(historyKey, JSON.stringify(history));
-
-            showNotification('J-0108 发来新消息');
-
-            if (currentContact === 'juzumaru' && document.getElementById('chatScreen').style.display === 'flex') {
-                const div = document.createElement('div');
-                div.className = 'message received';
-                div.innerHTML = `<div class="bubble"><div class="jp-text">${escapeHtml(reply.jp)}</div><hr class="bubble-divider"><div class="cn-text">${escapeHtml(reply.cn)}</div></div>`;
-                document.getElementById('chatMessages').appendChild(div);
-                document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-            }
-        }
-
         closeDateJumpModal();
+        requestSave();
         selectCalendarDate(calendarSelectedDate);
-        renderCalendar();
     }
 
-    document.getElementById('closeDateJump').addEventListener('click', closeDateJumpModal);
-    document.getElementById('cancelDateJump').addEventListener('click', closeDateJumpModal);
-    document.getElementById('confirmDateJump').addEventListener('click', jumpToDate);
+    function validateAndParseJumpDate() {
+        const yEl = document.getElementById('jumpYear');
+        const mEl = document.getElementById('jumpMonth');
+        const dEl = document.getElementById('jumpDay');
+        const y = parseInt(yEl ? yEl.value : 2216);
+        const m = parseInt(mEl ? mEl.value : 11);
+        const d = parseInt(dEl ? dEl.value : 13);
+        if (isNaN(y) || y < 0 || y > 2250) { showToast('年份需在0-2250之间'); return false; }
+        if (y < 2000) { showToast('终端损毁，暂无法前往'); return false; }
+        if (isNaN(m) || m < 1 || m > 12) { showToast('月份需在1-12之间'); return false; }
+        const maxDay = new Date(y, m, 0).getDate();
+        if (isNaN(d) || d < 1 || d > maxDay) { showToast(`日期需在1-${maxDay}之间`); return false; }
+        calendarCurrentDate = new Date(y, m - 1, d);
+        calendarSelectedDate = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        return true;
+    }
+
+    function applyNewDateState() {
+        state.dateJumpCount++;
+        randomizeMapMarker();
+        if (state.j0108Offline) {
+            state.j0108Offline = false;
+        } else if (state.j0108ContactUnlocked && Math.random() < 0.3) {
+            state.j0108Offline = true;
+        }
+    }
+
+    function sendDateJumpReplyIfNeeded() {
+        if (!state.j0108ContactUnlocked) return;
+        if (state.j0108Offline) return;
+        const idx = state.dateJumpReplyIndex % dateJumpReplies.length;
+        const reply = dateJumpReplies[idx];
+        state.dateJumpReplyIndex = (idx + 1) % dateJumpReplies.length;
+        queueMessages([reply], 'juzumaru');
+    }
+
+    const closeDateJumpBtn = document.getElementById('closeDateJump');
+    if (closeDateJumpBtn) closeDateJumpBtn.addEventListener('click', closeDateJumpModal);
+    const cancelDateJumpBtn = document.getElementById('cancelDateJump');
+    if (cancelDateJumpBtn) cancelDateJumpBtn.addEventListener('click', closeDateJumpModal);
+    const confirmDateJumpBtn = document.getElementById('confirmDateJump');
+    if (confirmDateJumpBtn) confirmDateJumpBtn.addEventListener('click', jumpToDate);
 
     function restartAction() {
         state.restartCount++;
-        if (state.cond11 && state.restartCount >= 3 && !state.endingTriggered) {
-            showEnding("徒然无所得", "Bad End");
+        if (state.sosSent && state.restartCount >= 3 && !state.endingTriggered) {
+            showEnding("徒然无所得", "Normal End");
             return;
         }
         const overlay = document.createElement('div'); overlay.className='restart-overlay'; overlay.innerHTML = '<div>重启中</div>';
-        document.getElementById('phoneInner').appendChild(overlay);
+        const phoneInner = document.getElementById('phoneInner');
+        if (phoneInner) phoneInner.appendChild(overlay);
         setTimeout(()=> { overlay.remove(); location.reload(); }, 4000);
     }
 
     function renderSettingsList() {
-        const c = document.getElementById('settingsContent');
+        const c = dom.settingsContent;
+        if (!c) return;
         c.innerHTML = `<div style="padding:8px;">
-            <div class="mail-list-item read" id="initBtn"><div class="mail-subject">初始化</div></div>
-            <div class="mail-list-item read" id="restartBtn"><div class="mail-subject">重启</div></div>
-            <div class="mail-list-item read" id="toggleLocationBtn"><div class="mail-subject">定位授权</div><div style="font-size:12px;color:#888;margin-top:4px;">当前状态：${state.locationPromptAnswered === 'yes' ? '开启' : '关闭'}</div></div>
+            <div class="mail-list-item read" data-action="init"><div class="mail-subject">初始化</div></div>
+            <div class="mail-list-item read" data-action="restart"><div class="mail-subject">重启</div></div>
+            <div class="mail-list-item read" data-action="toggleLocation"><div class="mail-subject">定位授权</div><div style="font-size:12px;color:#888;margin-top:4px;">当前状态：${state.locationPromptAnswered === 'yes' ? '开启' : '关闭'}</div></div>
         </div>`;
-        document.getElementById('initBtn').addEventListener('click', ()=>{
-            const panel = document.createElement('div'); panel.className='root-panel';
-            panel.innerHTML = `<div style="background:rgba(0,0,0,0.8);padding:30px;border-radius:28px;text-align:center;"><p style="color:#f0eaff;margin-bottom:24px;">确定要初始化吗？<br><span style="font-size:14px;color:#ccc;">所有数据将被清除</span></p><button id="initConfirmYes">是</button><button id="initConfirmNo">否</button></div>`;
-            document.getElementById('phoneInner').appendChild(panel);
-            document.getElementById('initConfirmYes').addEventListener('click', ()=>{ localStorage.clear(); location.reload(); });
-            document.getElementById('initConfirmNo').addEventListener('click', ()=> panel.remove());
-        });
-        document.getElementById('restartBtn').addEventListener('click', ()=>{
-            const panel = document.createElement('div'); panel.className='root-panel';
-            panel.innerHTML = `<div style="background:rgba(0,0,0,0.8);padding:30px;border-radius:28px;text-align:center;"><p style="color:#f0eaff;margin-bottom:24px;">确定要重启吗？</p><button id="restartConfirmYes">是</button><button id="restartConfirmNo">否</button></div>`;
-            document.getElementById('phoneInner').appendChild(panel);
-            document.getElementById('restartConfirmYes').addEventListener('click', ()=>{ panel.remove(); restartAction(); });
-            document.getElementById('restartConfirmNo').addEventListener('click', ()=> panel.remove());
-        });
-        document.getElementById('toggleLocationBtn').addEventListener('click', ()=>{
-            const panel = document.createElement('div'); panel.className='root-panel';
-            const currentStatus = state.locationPromptAnswered === 'yes' ? '已授权' : (state.locationPromptAnswered === 'no' ? '已拒绝' : '未设置');
-            panel.innerHTML = `<div style="background:rgba(0,0,0,0.8);padding:30px;border-radius:28px;text-align:center;"><p style="color:#f0eaff;margin-bottom:24px;">定位授权<br><span style="font-size:14px;color:#ccc;">当前状态：${state.locationPromptAnswered === 'yes' ? '开启' : '关闭'}</span></p><button id="toggleLocationYes">开启</button><button id="toggleLocationNo">关闭</button></div>`;
-            document.getElementById('phoneInner').appendChild(panel);
-            document.getElementById('toggleLocationYes').addEventListener('click', ()=>{ 
-                const wasNo = state.locationPromptAnswered === 'no';
-                state.locationPromptAnswered = 'yes'; 
-                state.cond7 = true; 
-                if (wasNo && !state.cond8) {
-                    state.cond8 = true;
-                }
-                saveAll(); 
-                panel.remove(); 
-                renderSettingsList();
-                showToast('已开启定位授权'); 
-            });
-            document.getElementById('toggleLocationNo').addEventListener('click', ()=>{ 
-                const wasYes = state.locationPromptAnswered === 'yes';
-                state.locationPromptAnswered = 'no'; 
-                state.cond7 = false; 
-                if (wasYes && !state.locationClosedReplyShown && state.j0108ContactUnlocked) {
-                    state.locationClosedReplyShown = true;
-                    saveAll();
-                    const replyObj = { jp: "位置情報の許可をオフにされましたか。端末からあなた様の位置情報を取得できなくなりました。", cn: "您关闭了定位授权吗？我在终端内无法同步您的位置信息。" };
-                    const historyKey = 'chat_history_juzumaru';
-                    let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
-                    history.push({ type: 'received', content: replyObj });
-                    localStorage.setItem(historyKey, JSON.stringify(history));
-                    showNotification('J-0108 发来新消息');
-                    if (currentContact === 'juzumaru' && document.getElementById('chatScreen').style.display === 'flex') {
-                        const div = document.createElement('div'); div.className = 'message received';
-                        div.innerHTML = `<div class="bubble"><div class="jp-text">${escapeHtml(replyObj.jp)}</div><hr class="bubble-divider"><div class="cn-text">${escapeHtml(replyObj.cn)}</div></div>`;
-                        document.getElementById('chatMessages').appendChild(div);
-                        document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-                    }
-                } else {
-                    saveAll();
-                }
-                panel.remove(); 
-                renderSettingsList();
-                showToast('已关闭定位授权'); 
-            });
-        });
+    }
+
+    function buildContactItem(contactId, name, avatar, historyKey) {
+        const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        const lastMsg = history[history.length - 1];
+        let preview = '点击开始对话...', time = '上午 10:01';
+        if (lastMsg) {
+            preview = lastMsg.type === 'sent'
+                ? (lastMsg.isImage ? '[图片]' : (lastMsg.fileTitle ? '[文件]' : lastMsg.content))
+                : (typeof lastMsg.content === 'object' ? lastMsg.content.cn : lastMsg.content);
+            time = '刚刚';
+        }
+        return `<div class="message-list-item" data-contact-id="${contactId}">
+            <div style="display:flex; align-items:center; gap:12px; width:100%;">
+                <img src="${avatar}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between;"><strong class="message-list-name">${escapeHtml(name)}</strong><span class="message-list-time">${time}</span></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;"><span class="message-list-preview">${escapeHtml(preview)}</span></div>
+                </div>
+            </div>
+        </div>`;
     }
 
     function updateMessageList() {
-        const container = document.getElementById('messageListContainer');
+        const container = dom.messageListContainer;
+        if (!container) return;
         let html = '';
         if (state.j0108ContactUnlocked) {
-            const historyKey = 'chat_history_juzumaru';
-            const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
-            const lastMsg = history[history.length - 1];
-            let preview = '点击开始对话...', time = '上午 10:01';
-            if (lastMsg) {
-                preview = lastMsg.type === 'sent' ? (lastMsg.isImage ? '[图片]' : (lastMsg.fileTitle ? '[文件]' : lastMsg.content)) : (typeof lastMsg.content === 'object' ? lastMsg.content.cn : lastMsg.content);
-                time = '刚刚';
-            }
-            html += `<div class="message-list-item" data-contact-id="juzumaru">
-                <div style="display:flex; align-items:center; gap:12px; width:100%;">
-                    <img src="assets/images/J-0108.png" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
-                    <div style="flex:1;">
-                        <div style="display:flex; justify-content:space-between;"><strong class="message-list-name">J-0108</strong><span class="message-list-time">${time}</span></div>
-                        <div style="display:flex; justify-content:space-between; align-items:center;"><span class="message-list-preview">${escapeHtml(preview)}</span></div>
-                    </div>
-                </div>
-            </div>`;
+            html += buildContactItem('juzumaru', 'J-0108', 'assets/images/J-0108.png', STORAGE_KEYS.CHAT_PREFIX + 'juzumaru');
         }
         if (state.californiaAdded) {
-            const historyKey = 'chat_history_kashuu';
-            const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
-            const lastMsg = history[history.length - 1];
-            let preview = '点击开始对话...', time = '上午 10:01';
-            if (lastMsg) {
-                preview = lastMsg.type === 'sent' ? (lastMsg.isImage ? '[图片]' : (lastMsg.fileTitle ? '[文件]' : lastMsg.content)) : (typeof lastMsg.content === 'object' ? lastMsg.content.cn : lastMsg.content);
-                time = '刚刚';
-            }
-            html += `<div class="message-list-item" data-contact-id="kashuu">
-                <div style="display:flex; align-items:center; gap:12px; width:100%;">
-                    <img src="assets/images/kashuu.jpg" style="width:48px;height:48px;border-radius:50%;object-fit:cover;" alt="加州清光">
-                    <div style="flex:1;">
-                        <div style="display:flex; justify-content:space-between;"><strong class="message-list-name">加州清光</strong><span class="message-list-time">${time}</span></div>
-                        <div style="display:flex; justify-content:space-between; align-items:center;"><span class="message-list-preview">${escapeHtml(preview)}</span></div>
-                    </div>
-                </div>
-            </div>`;
+            html += buildContactItem('kashuu', '加州清光', 'assets/images/kashuu.jpg', STORAGE_KEYS.CHAT_PREFIX + 'kashuu');
         }
         container.innerHTML = html;
         container.querySelectorAll('.message-list-item').forEach(item => item.addEventListener('click', () => {
@@ -1612,7 +1769,13 @@
     }
 
     function updateCameraImages() {
-        currentCameraImages = [...BASE_CAMERA_IMAGES];
+        if (state.cameraFlipped) {
+            currentCameraImages = ['assets/images/selfie.jpg'];
+        } else {
+            currentCameraImages = ['assets/images/picture_1.jpg'];
+            if (state.picture1Taken) currentCameraImages.push('assets/images/picture_2.jpg');
+            if (state.picture2Taken) currentCameraImages.push('assets/images/picture_3.jpg');
+        }
         if (calendarSelectedDate >= '2024-04-13' && calendarSelectedDate <= '2026-11-03') {
             currentCameraImages.push('assets/images/lotus.jpg');
         }
@@ -1621,66 +1784,48 @@
         }
     }
 
-    function openCamera() {
-        document.getElementById('homeScreen').style.display='none';
-        document.querySelectorAll('.fullscreen-view').forEach(v=>v.style.display='none');
-        document.getElementById('cameraScreen').style.display='flex';
-        updateCameraImages();
-        if (state.cameraImageIndex >= currentCameraImages.length) {
-            state.cameraImageIndex = 0;
-        }
-        document.getElementById('cameraBackground').style.backgroundImage = `url('${currentCameraImages[state.cameraImageIndex]}')`;
-    }
-    function capturePhoto() {
-        const url = currentCameraImages[state.cameraImageIndex];
-        if (url === TEMPLE_IMAGE) {
-            showToast('无法保存此图像');
-            return;
-        }
-        if (!state.availableImages.includes(url)) state.availableImages.push(url);
-        if (url === 'assets/images/lotus.jpg') state.bg4Unlocked = true;
-        saveAll(); refreshAlbum(); showToast('照片已保存');
-    }
-    function switchCameraImage() {
-        updateCameraImages();
-        state.cameraImageIndex = (state.cameraImageIndex + 1) % currentCameraImages.length;
-        document.getElementById('cameraBackground').style.backgroundImage = `url('${currentCameraImages[state.cameraImageIndex]}')`;
-    }
-
     function showScreen(id) {
-        document.querySelectorAll('.fullscreen-view').forEach(v=>v.style.display='none');
-        document.getElementById('cameraScreen').style.display='none';
-        document.getElementById('homeScreen').style.display='none';
-        if (id==='home') {
-            document.getElementById('homeScreen').style.display='';
+        document.querySelectorAll('.fullscreen-view').forEach(v => v.style.display = 'none');
+        if (dom.cameraScreen) dom.cameraScreen.style.display = 'none';
+        if (dom.mapScreen) dom.mapScreen.style.display = 'none';
+        if (dom.homeScreen) dom.homeScreen.style.display = 'none';
+        if (id === 'home') {
+            if (dom.homeScreen) dom.homeScreen.style.display = '';
             updateClockDate();
-        }
-        else if (id==='messageList') { document.getElementById('messageListScreen').style.display='flex'; updateMessageList(); }
-        else if (id==='chat') {
-            document.getElementById('chatScreen').style.display='flex';
+        } else if (id === 'messageList') {
+            if (dom.messageListScreen) dom.messageListScreen.style.display = 'flex';
+            updateMessageList();
+        } else if (id === 'chat') {
+            if (dom.chatScreen) dom.chatScreen.style.display = 'flex';
             updateChatTitle();
-            if (currentContact === 'kashuu') {
-                const history = JSON.parse(localStorage.getItem(getChatHistoryKey()) || '[]');
-                if (history.length === 0) {
-                    const initialMsg = {
-                        type: 'received',
-                        content: {
-                            jp: "あー。川の下の子です。加州清光。扱いづらいけど、性能はいい感じってね。",
-                            cn: "啊－我是川下之子，加州清光。虽然不好上手，但性能很不错的喔。"
-                        }
-                    };
-                    saveChatMessage(initialMsg);
-                }
-            }
+            setOnlineStatus();
+            updateChatInputHints();
             loadChatHistory();
+        } else if (id === 'mail') {
+            if (dom.mailScreen) dom.mailScreen.style.display = 'flex';
+            renderMailList();
+        } else if (id === 'album') {
+            if (dom.albumScreen) dom.albumScreen.style.display = 'flex';
+            refreshAlbum();
+        } else if (id === 'memo') {
+            if (dom.memoScreen) dom.memoScreen.style.display = 'flex';
+            refreshMemo();
+        } else if (id === 'calendar') {
+            if (dom.calendarScreen) dom.calendarScreen.style.display = 'flex';
+            renderCalendar();
+        } else if (id === 'camera') {
+            if (dom.cameraScreen) dom.cameraScreen.style.display = 'flex';
+            updateCameraImages();
+            if (state.cameraImageIndex >= currentCameraImages.length) state.cameraImageIndex = 0;
+            if (dom.cameraBackground) dom.cameraBackground.style.backgroundImage = `url('${currentCameraImages[state.cameraImageIndex]}')`;
+        } else if (id === 'settings') {
+            if (dom.settingsScreen) dom.settingsScreen.style.display = 'flex';
+            renderSettingsList();
+        } else if (id === 'map') {
+            if (dom.mapScreen) dom.mapScreen.style.display = 'flex';
+            initMapGestures();
+            resetMapView();
         }
-        else if (id==='mail') { document.getElementById('mailScreen').style.display='flex'; renderMailList(); }
-        else if (id==='album') { document.getElementById('albumScreen').style.display='flex'; refreshAlbum(); }
-        else if (id==='memo') { document.getElementById('memoScreen').style.display='flex'; refreshMemo(); }
-        else if (id==='calendar') { document.getElementById('calendarScreen').style.display='flex'; renderCalendar(); }
-        else if (id==='camera') openCamera();
-        else if (id==='settings') { document.getElementById('settingsScreen').style.display='flex'; renderSettingsList(); }
-        else if (id==='map') openMap();
     }
 
     document.querySelectorAll('.backToHomeBtn').forEach(btn=> btn.addEventListener('click', (e)=>{
@@ -1700,26 +1845,31 @@
         else if (app==='chat') showScreen('messageList');
         else showScreen(app);
     }));
-    document.getElementById('sendTextBtn').addEventListener('click', ()=>sendTextMessage(document.getElementById('chatInput').value));
-    document.getElementById('chatInput').addEventListener('keypress', e=>{ if(e.key==='Enter') sendTextMessage(e.target.value); });
-    document.getElementById('selectPhotoBtn').addEventListener('click', showAttachmentPicker);
-    document.getElementById('captureBtn').addEventListener('click', capturePhoto);
-    document.getElementById('switchCameraBtn').addEventListener('click', switchCameraImage);
+    const sendTextBtn = document.getElementById('sendTextBtn');
+    if (sendTextBtn) sendTextBtn.addEventListener('click', ()=>sendTextMessage(dom.chatInput ? dom.chatInput.value : ''));
+    const chatInputEl = document.getElementById('chatInput');
+    if (chatInputEl) chatInputEl.addEventListener('keypress', e=>{ if(e.key==='Enter') sendTextMessage(e.target.value); });
+    const selectPhotoBtn = document.getElementById('selectPhotoBtn');
+    if (selectPhotoBtn) selectPhotoBtn.addEventListener('click', showAttachmentPicker);
+    const captureBtn = document.getElementById('captureBtn');
+    if (captureBtn) captureBtn.addEventListener('click', capturePhoto);
+    const switchCameraBtn = document.getElementById('switchCameraBtn');
+    if (switchCameraBtn) switchCameraBtn.addEventListener('click', switchCameraImage);
 
     function stopLyricTimer() { if(lyricTimer) clearInterval(lyricTimer); lyricTimer=null; }
     function formatTime(s) { if(isNaN(s)||s<0) return "0:00"; const m=Math.floor(s/60), sec=Math.floor(s%60); return `${m}:${sec.toString().padStart(2,'0')}`; }
     function updateProgressDisplay() {
         const f=document.getElementById('progressFill'), ct=document.getElementById('currentTime'), tt=document.getElementById('totalTime');
-        if(totalDuration>0) { f.style.width=Math.min(simulatedTime/totalDuration*100,100)+'%'; ct.innerText=formatTime(simulatedTime); tt.innerText=formatTime(totalDuration); }
-        else { f.style.width='0%'; ct.innerText='0:00'; tt.innerText='0:00'; }
+        if(totalDuration>0) { if(f) f.style.width=Math.min(simulatedTime/totalDuration*100,100)+'%'; if(ct) ct.innerText=formatTime(simulatedTime); if(tt) tt.innerText=formatTime(totalDuration); }
+        else { if(f) f.style.width='0%'; if(ct) ct.innerText='0:00'; if(tt) tt.innerText='0:00'; }
     }
-    function setLyric(i) { const t=playlist[currentTrack]; if(t&&t.lyrics[i]!==undefined) document.getElementById('lyricsPreview').innerText=t.lyrics[i]; }
+    function setLyric(i) { const t=playlist[currentTrack]; if(t&&t.lyrics[i]!==undefined) { const el = document.getElementById('lyricsPreview'); if(el) el.innerText=t.lyrics[i]; } }
     function startLyricProgression() {
         stopLyricTimer();
         const track=playlist[currentTrack]; if(!track||!track.lyrics.length) return;
         lyricTimer=setInterval(()=>{
             currentLyricIndex++;
-            if(currentLyricIndex>=track.lyrics.length) { stopLyricTimer(); isPlaying=false; document.getElementById('playPauseBtn').innerText='▶'; simulatedTime=totalDuration; }
+            if(currentLyricIndex>=track.lyrics.length) { stopLyricTimer(); isPlaying=false; const el = document.getElementById('playPauseBtn'); if(el) el.innerText='▶'; simulatedTime=totalDuration; }
             else { setLyric(currentLyricIndex); simulatedTime=currentLyricIndex*(LYRICS_DURATION/1000); }
             updateProgressDisplay();
         }, LYRICS_DURATION);
@@ -1727,25 +1877,32 @@
     function playTrack(i) {
         stopLyricTimer(); currentTrack=i; const track=playlist[currentTrack]; currentLyricIndex=0;
         totalDuration=track.lyrics.length*(LYRICS_DURATION/1000); simulatedTime=0; setLyric(0); updateProgressDisplay();
-        document.getElementById('currentSongName').innerText=track.name; document.getElementById('playPauseBtn').innerText='❙❙'; isPlaying=true;
-        if(!state.musicPlayedFlags[currentTrack]) { state.musicPlayedFlags[currentTrack]=true; if(document.getElementById('memoScreen').style.display==='flex') refreshMemo(); saveAll(); }
+        const csn = document.getElementById('currentSongName');
+        if(csn) csn.innerText=track.name; 
+        const ppb = document.getElementById('playPauseBtn');
+        if(ppb) ppb.innerText='❙❙'; 
+        isPlaying=true;
+        if(!state.musicPlayedFlags[currentTrack]) { state.musicPlayedFlags[currentTrack]=true; const ms = document.getElementById('memoScreen'); if(ms && ms.style.display==='flex') refreshMemo(); requestSave(); }
         startLyricProgression();
     }
     function togglePlayPause() {
-        if(isPlaying) { stopLyricTimer(); isPlaying=false; document.getElementById('playPauseBtn').innerText='▶'; }
+        if(isPlaying) { stopLyricTimer(); isPlaying=false; const el = document.getElementById('playPauseBtn'); if(el) el.innerText='▶'; }
         else {
             if(simulatedTime>=totalDuration) playTrack(currentTrack);
-            else { isPlaying=true; document.getElementById('playPauseBtn').innerText='❙❙'; startLyricProgression(); }
+            else { isPlaying=true; const el = document.getElementById('playPauseBtn'); if(el) el.innerText='❙❙'; startLyricProgression(); }
         }
         handleUserInteraction();
     }
-    document.getElementById('prevBtn').addEventListener('click', ()=>{ currentTrack=(currentTrack-1+playlist.length)%playlist.length; playTrack(currentTrack); handleUserInteraction(); });
-    document.getElementById('nextBtn').addEventListener('click', ()=>{ currentTrack=(currentTrack+1)%playlist.length; playTrack(currentTrack); handleUserInteraction(); });
-    document.getElementById('playPauseBtn').addEventListener('click', togglePlayPause);
+    const prevBtn = document.getElementById('prevBtn');
+    if (prevBtn) prevBtn.addEventListener('click', ()=>{ currentTrack=(currentTrack-1+playlist.length)%playlist.length; playTrack(currentTrack); handleUserInteraction(); });
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) nextBtn.addEventListener('click', ()=>{ currentTrack=(currentTrack+1)%playlist.length; playTrack(currentTrack); handleUserInteraction(); });
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
 
     let battery=100;
     let batteryLowAlertShown=false;
-    setInterval(()=>{ if(battery<=0) return; battery=Math.max(0,battery-(battery>20?1:Math.ceil(Math.random()*3))); document.getElementById('batteryPercent').innerText=battery+'%'; document.getElementById('batteryFill').style.width=battery+'%'; if(battery<=10 && !batteryLowAlertShown){ batteryLowAlertShown=true; showNotification('电量过低，请尽快连接电源'); } if(battery<=0) showEnding("如是观", "Reload End"); },30000);
+    setInterval(()=>{ if(battery<=0) return; battery=Math.max(0,battery-(battery>20?1:Math.ceil(Math.random()*3))); const bp = document.getElementById('batteryPercent'); if(bp) bp.innerText=battery+'%'; const bf = document.getElementById('batteryFill'); if(bf) bf.style.width=battery+'%'; if(battery<=10 && !batteryLowAlertShown){ batteryLowAlertShown=true; showNotification('电量过低，请尽快连接电源'); } if(battery<=0) showEnding("如是观", "Reload End"); },30000);
     let signalLevel = 2, signalDir = 1;
     setInterval(()=>{
         signalLevel += signalDir;
@@ -1754,9 +1911,9 @@
         document.querySelectorAll('#signalBars .signal-dot').forEach((d,i)=> d.style.opacity = i < signalLevel ? '1' : '0.2');
     }, 3000);
     setInterval(()=>{
-        if(!state.specialMailShown) { state.specialMailShown=true; saveAll(); showNotification('收到新邮件：关于时空观测基准的修正通知'); }
+        if(!state.specialMailShown) { state.specialMailShown=true; requestSave(); showNotification('收到新邮件：关于时空观测基准的修正通知'); }
     },25000);
-    setInterval(()=>{ const now=new Date(); const t=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`; document.getElementById('clockTime').innerText=t; document.getElementById('statusTime').innerText=t; },1000);
+    setInterval(()=>{ const now=new Date(); const t=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`; const ct = document.getElementById('clockTime'); if(ct) ct.innerText=t; const st = document.getElementById('statusTime'); if(st) st.innerText=t; },1000);
 
     function migrateCalendarEvents() {
         for (let date in calendarEvents) {
@@ -1767,8 +1924,8 @@
     }
 
     function triggerBlackScreen(targetDate) {
-        const overlay = document.getElementById('blackScreenOverlay');
-        const digitsEl = document.getElementById('timeJumpDigits');
+        const overlay = dom.blackScreenOverlay;
+        const digitsEl = dom.timeJumpDigits;
         if (!overlay) return;
 
         const targetStr = targetDate ? targetDate.replace(/-/g, '/') : '----/--/--';
@@ -1777,26 +1934,26 @@
 
         setTimeout(() => {
             overlay.classList.add('show-text');
-            digitsEl.classList.add('glitching');
+            if (digitsEl) digitsEl.classList.add('glitching');
 
             let count = 0;
             const interval = setInterval(() => {
                 const y = 2000 + Math.floor(Math.random() * 300);
                 const m = String(1 + Math.floor(Math.random() * 12)).padStart(2, '0');
                 const d = String(1 + Math.floor(Math.random() * 28)).padStart(2, '0');
-                digitsEl.textContent = `${y}/${m}/${d}`;
+                if (digitsEl) digitsEl.textContent = `${y}/${m}/${d}`;
                 count++;
-                if (count >= 12) { clearInterval(interval); digitsEl.classList.remove('glitching'); digitsEl.textContent = targetStr; }
+                if (count >= 12) { clearInterval(interval); if(digitsEl) digitsEl.classList.remove('glitching'); if(digitsEl) digitsEl.textContent = targetStr; }
             }, 70);
 
             setTimeout(() => {
                 overlay.classList.remove('show-text');
                 clearInterval(interval);
-                digitsEl.classList.remove('glitching');
+                if(digitsEl) digitsEl.classList.remove('glitching');
 
                 setTimeout(() => {
                     overlay.classList.remove('active');
-                    digitsEl.textContent = '----/--/--';
+                    if(digitsEl) digitsEl.textContent = '----/--/--';
                 }, 250);
             }, 900);
         }, 180);
@@ -1809,22 +1966,26 @@
     ];
 
     function setGlitchImage(phase) {
-        const overlay = document.getElementById('darkOverlay');
+        const overlay = dom.darkOverlay;
         if (!overlay) return;
-        overlay.querySelectorAll('.glitch-img').forEach(img => img.remove());
-        if (phase < 1 || phase > 3) return;
-        const img = document.createElement('img');
-        img.className = 'glitch-img';
+        let img = overlay.querySelector('.glitch-img');
+        if (phase < 1 || phase > 3) {
+            if (img) img.remove();
+            return;
+        }
+        if (!img) {
+            img = document.createElement('img');
+            img.className = 'glitch-img';
+            img.alt = '';
+            overlay.appendChild(img);
+        }
         img.src = GLITCH_IMG_PHASES[phase - 1];
-        img.alt = '';
-        overlay.appendChild(img);
     }
 
     function updateDarkOverlay() {
-        const overlay = document.getElementById('darkOverlay');
+        const overlay = dom.darkOverlay;
         if (!overlay) return;
         overlay.classList.remove('phase-1', 'phase-2', 'phase-3');
-        overlay.querySelectorAll('.glitch-img').forEach(img => img.remove());
         if (state.dateJumpCount >= 5) {
             overlay.style.display = 'block';
             if (state.dateJumpCount >= 12) {
@@ -1839,15 +2000,122 @@
             }
         } else {
             overlay.style.display = 'none';
+            setGlitchImage(0);
         }
     }
 
     function updateSongDisplay() {
         const track = playlist[currentTrack];
-        document.getElementById('currentSongName').innerText = track.name;
-        document.getElementById('lyricsPreview').innerText = track.lyrics[0] || '';
+        const csn = document.getElementById('currentSongName');
+        if(csn) csn.innerText = track.name;
+        const lp = document.getElementById('lyricsPreview');
+        if(lp) lp.innerText = track.lyrics[0] || '';
     }
 
+    function capturePhoto() {
+        const url = currentCameraImages[state.cameraImageIndex];
+        if (url === TEMPLE_IMAGE) {
+            showToast('无法保存此图像');
+            return;
+        }
+        if (!state.availableImages.includes(url)) state.availableImages.push(url);
+        if (url === 'assets/images/picture_1.jpg') state.picture1Taken = true;
+        if (url === 'assets/images/picture_2.jpg') state.picture2Taken = true;
+        requestSave(); refreshAlbum(); showToast('照片已保存');
+    }
+    function switchCameraImage() {
+        state.cameraFlipped = !state.cameraFlipped;
+        updateCameraImages();
+        state.cameraImageIndex = 0;
+        if (dom.cameraBackground) dom.cameraBackground.style.backgroundImage = `url('${currentCameraImages[state.cameraImageIndex]}')`;
+    }
+
+    function initEventDelegation() {
+        if (dom.calendarContent) {
+            dom.calendarContent.addEventListener('click', e => {
+                let target = e.target.closest('[data-action]');
+                if (!target) return;
+                let act = target.dataset.action;
+                if (act === 'day') selectCalendarDate(target.dataset.date);
+                else if (act === 'jump') openDateJumpModal();
+                else if (act === 'list') { calendarViewMode = 'allEvents'; renderCalendar(); }
+                else if (act === 'addEvent') addCalendarEvent();
+                else if (act === 'delEvent') {
+                    e.stopPropagation();
+                    const idx = parseInt(target.dataset.idx);
+                    const currentList = calendarEvents[calendarSelectedDate];
+                    const deleted = currentList[idx].text;
+                    currentList.splice(idx, 1);
+                    if (currentList.length === 0) delete calendarEvents[calendarSelectedDate];
+                    if (deleted === '前往本兴寺虫干会' && calendarSelectedDate === '2026-11-03' && !state.easterEggTriggered) {
+                        state.easterEggTriggered = true;
+                        triggerEasterEgg();
+                    }
+                    requestSave(); renderCalendar();
+                }
+            });
+            dom.calendarContent.addEventListener('keypress', e => {
+                if (e.key === 'Enter' && e.target.id === 'calendarNoteInput') addCalendarEvent();
+            });
+        }
+
+        if (dom.settingsContent) {
+            dom.settingsContent.addEventListener('click', e => {
+                let btn = e.target.closest('[data-action]');
+                if (!btn) return;
+                let act = btn.dataset.action;
+                if (act === 'init') {
+                    showConfirmDialog('确定要初始化吗？<br><span style="font-size:14px;color:#ccc;">所有数据将被清除</span>', ()=>{ localStorage.clear(); location.reload(); });
+                } else if (act === 'restart') {
+                    showConfirmDialog('确定要重启吗？', () => restartAction());
+                } else if (act === 'toggleLocation') {
+                    const panel = document.createElement('div'); panel.className='root-panel';
+                    panel.innerHTML = `<div style="background:rgba(0,0,0,0.8);padding:30px;border-radius:28px;text-align:center;"><p style="color:#f0eaff;margin-bottom:24px;">定位授权<br><span style="font-size:14px;color:#ccc;">当前状态：${state.locationPromptAnswered === 'yes' ? '开启' : '关闭'}</span></p><button id="toggleLocationYes" style="background:#c3b7f0;border:none;border-radius:30px;padding:8px 24px;color:white;font-size:16px;cursor:pointer;margin:10px;">开启</button><button id="toggleLocationNo" style="background:#c3b7f0;border:none;border-radius:30px;padding:8px 24px;color:white;font-size:16px;cursor:pointer;margin:10px;">关闭</button></div>`;
+                    if (dom.phoneInner) dom.phoneInner.appendChild(panel);
+                    const yesBtn = document.getElementById('toggleLocationYes');
+                    if (yesBtn) yesBtn.addEventListener('click', ()=>{ 
+                        state.locationPromptAnswered = 'yes'; state.locationAgreed = true; requestSave(); 
+                        panel.remove(); renderSettingsList(); showToast('已开启定位授权'); 
+                        updateChatInputHints();
+                    });
+                    const noBtn = document.getElementById('toggleLocationNo');
+                    if (noBtn) noBtn.addEventListener('click', ()=>{ 
+                        const wasYes = state.locationPromptAnswered === 'yes';
+                        state.locationPromptAnswered = 'no'; state.locationAgreed = false; 
+                        if (wasYes && !state.locationClosedReplyShown && state.j0108ContactUnlocked) {
+                            state.locationClosedReplyShown = true;
+                            requestSave();
+                            queueMessages([{ jp: "位置情報の許可をオフにされましたか。端末からあなた様の位置情報を取得できなくなりました。", cn: "您关闭了定位授权吗？我在终端内无法同步您的位置信息。" }], 'juzumaru');
+                        } else { requestSave(); }
+                        panel.remove(); renderSettingsList(); showToast('已关闭定位授权'); 
+                        updateChatInputHints();
+                    });
+                }
+            });
+        }
+
+        if (dom.mailContent) {
+            dom.mailContent.addEventListener('click', e => {
+                const mailItem = e.target.closest('.mail-list-item');
+                if (mailItem) {
+                    openMailDetail(mailItem.dataset.mailId);
+                    return;
+                }
+                const action = e.target.closest('[data-action]');
+                if (!action) return;
+                const act = action.dataset.action;
+                if (act === 'compose-show') {
+                    const ca = document.getElementById('composeArea');
+                    if (ca) ca.style.display = 'flex';
+                } else if (act === 'compose-send') {
+                    handleSendMail();
+                }
+            });
+        }
+    }
+
+    initDomCache(); 
+    initEventDelegation(); 
     loadAll();
 })();
 </script>
