@@ -1816,6 +1816,11 @@
         } else if (id === 'camera') {
             if (dom.cameraScreen) dom.cameraScreen.style.display = 'flex';
             updateCameraImages();
+            if (!state.cameraFlipped) {
+                if (state.picture2Taken) state.cameraImageIndex = 2;
+                else if (state.picture1Taken) state.cameraImageIndex = 1;
+                else state.cameraImageIndex = 0;
+            }
             if (state.cameraImageIndex >= currentCameraImages.length) state.cameraImageIndex = 0;
             if (dom.cameraBackground) dom.cameraBackground.style.backgroundImage = `url('${currentCameraImages[state.cameraImageIndex]}')`;
         } else if (id === 'settings') {
