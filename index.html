@@ -195,7 +195,6 @@
         .offline-banner.show { display: block; }
     </style>
 <base target="_blank">
-<base target="_blank">
 </head>
 <body>
 <div class="phone-container" id="phoneContainer">
@@ -277,7 +276,9 @@
     const SOS_MAIL_1 = { sender: "时之政府救援协调部", subject: "关于救援请求的回复", body: "拝啓\n敬启者：\n\n████様、時之政府は貴殿より発せられた求救信号を受信いたしました。\n尊敬的████阁下，时之政府已收到您发出的求救信号。\n\nたとえ貴殿は現在審神者の職を退かれておりますが、これまでの時之政府への貢献を顧み、\n尽管您目前已卸任审神者职务，但念及您过往对时之政府之贡献，\n\n特別に承認された措置として、貴殿の所在する時空座標へ最寄りの検察官を派遣し、緊急援助を実施いたします。\n经特批，我们将就近调遣检察官前往您所在时空坐标，实施紧急援助。\n\n救援人員が到着するまで、どうかご自身の安全を確保の上、不要な行動は控えていただきますようお願い申し上げます。\n在援护人员抵达之前，请务必确保自身安全，减少非必要行动。" };
     const SOS_MAIL_2 = { sender: "时之政府救援协调部", subject: "关于救援派遣的更新通知", body: "拝啓\n敬启者：\n\n████様、救援派遣の件につきまして、最新の進捗状況をご報告申し上げます。\n尊敬的████阁下，现就救援派遣事宜向您通报最新进展。\n\n特殊な状況により、当初予定しておりました最寄りの検察官の派遣は現時点では不可能となりました。\n因特殊状况，原定就近派遣之检察官目前无法成行。\n\nこれを受け、他の検察官を緊急に派遣させていただき、貴殿の時空座標の錨定を完了しております。\n我们已紧急改派其他检察官前往您所在时空，并已顺利锚定您的坐标位置。\n\nどうか端末を開放状態に保ち、しばらくお待ちください。\n请保持终端畅通，耐心等待。" };
     const TIP_MAIL = { sender: "???", subject: "终端使用须知（？）", body: "这台设备的时间显示似乎不太稳定，在不同日期醒来时，窗外的风景也许会变——也可能不会，谁知道呢。\n\n相机是个好东西，但记得多换几个角度看看。有些东西第一眼看不清，第二眼……也不一定看得清。\n\n如果聊天对象已读不回，也许不是网不好。试着给他看点什么？人对视觉信息总是更敏感嘛。\n\n邮件箱会自己长出新邮件，像蘑菇一样。记得勤收信，但别什么信都回——有些收件人可能并不想收到你的回复。\n\n日历上的待办事项可以划掉，也可以写新的。不过……已经写上去的事情，真的划得掉吗？\n\n音乐播放器里的歌，听完可能会留下点什么。也可能什么都不留下。取决于你在哪一天按下播放键。\n\n电量会自己跑掉，像沙漏里的沙子。低电量时记得找充电器——虽然这里可能并没有插座。\n\n如果觉得自己在原地打转，试试：①把看到的东西分享出去 ②去没去过的时间逛逛 ③检查一下邮箱有没有漏读的信 ④对日程表做点手脚。总有一招管用。" };    const GUIDE_MAIL_1 = { sender: "???", subject: "抄作业是不对的", body: "怎么了怎么了？\n又发生了什么事情。\n你说终端使用须知写的太模糊了？\n这是解密游戏啊——怎么可以一开始就给答案。\n抄作业是不对的。\n请多在时空里游走一下吧，或许会有意外惊喜！\n\nTip：我是按照刀啃乱布的游戏内时间和游戏外游戏真实上线时间设计的（日服日服）！\n所以有些日期你看着眼熟的话……不要怀疑自己，相信你的直觉。\n\n比较关键的时间节点位于8周年，无论按游戏内还是游戏外时间。\n中间的一百多年只是因为设计日历只能这样连续......\n对的，跳转基本什么都不会发生。\n哦，设计时间的时候还参考了某个刃的相关信息（例如开放日，重要财什么的）。\n\n还有，不要一上来就给J-0108发SOS，那样很多路线会被关掉的！\n先和他好好聊聊天不好吗？\n如果遇见图片裂开了，不要问图图去哪了。它后面会出现的。\n原因是因为网页加载图片很慢，容易裂开。我已经尽量把单张图压到150k以内了，但是首次加载还是避免不了有这个问题，都怪github！\n\nP.S. 如果你已经死档了……设置里有初始化按钮，按一下就好了。\n求求你们不要再笑这个游戏了，为了能正常运行我用尽了一切手段......如果还有bug，不是特别严重的就重新开始嘛，求求你了" };
-    const GUIDE_MAIL_2 = { sender: "???", subject: "小抄（不要告诉别人）", body: "真是拿你没办法。既然你又来求救了。那我就写小抄给你。\n此系统没有阅后即焚的效果。\n所以如果看到了，记住了，就当这封信不存在好吗？\n求求你了，我磨了这么久才做出来的。\n被人速通了，我不白设计了嘛......\n\n━━━━━━━━━━━━━━━━━━━━━━\n【小抄·时间跳转篇】\n━━━━━━━━━━━━━━━━━━━━━━\n\n日历右上角那个⚙️按钮，点进去可以跳时间。\n年份低于2000会报错，不要试了，我没做内容（诚实）。\n\n几个关键日期记得去：\n• 2024-01-19 到 2026-11-03 之间 → 文件里会多出一篇日记\n• 2213-07-13 到 2214-01-18 之间 → 健康诊断书解锁\n• 2225-07-03 之后 → 有一份档案等着你\n• 2205-01-14 → 会多出一个聊天对象哦\n• 2023-01-05 → 有我的彩蛋（喂）\n\n还有，2214-01-18 这个日子很特殊。\n去文件里看看「独白」在那天是不是能正常显示了？\n\n━━━━━━━━━━━━━━━━━━━━━━\n【小抄·聊天篇】\n━━━━━━━━━━━━━━━━━━━━━━\n\n给J-0108发邮件就能解锁聊天，记得同意定位！\n不同意也能玩，但会少很多剧情，而且跳转20次以上会迷路……\n  对了，「迷路」的前提是定位授权关闭。如果你同意定位了，就不会触发迷途。\n\n和他聊天时多发点东西：\n• 照片（去相机里拍，不同日期能拍到不一样的）\n• 文件（解锁后在文件应用里，点+号就能发）\n\n每发一个文件他都会说点什么，这些都是「收集要素」！\n要触发好结局的话，日记、诊断书、档案都要发给他看一遍。\n\n━━━━━━━━━━━━━━━━━━━━━━\n【小抄·关键词篇】\n━━━━━━━━━━━━━━━━━━━━━━\n\nJ-0108有26组关键词回复，多试试不同的词。\n但更重要的是——跳转时间超过5次之后，试着输入「数珠丸恒次」。\n对，就是他的真名。他会吓一跳的（笑）。\n\n━━━━━━━━━━━━━━━━━━━━━━\n【小抄·结局篇】\n━━━━━━━━━━━━━━━━━━━━━━\n\n8个结局，触发条件我懒得全写了，但给你几个提示：\n\n• 想要Happy End / True End：不要发SOS！不要发SOS！不要发SOS！\n  重要的事说三遍。发求救邮件会关闭很多路线。\n\n• 想要垂慈摄受（Good End）：\n  多发文件，多跳转，识破真名，同意定位，然后输入「我喜欢你」。\n  对，就是要这样！\n\n• 想要酬愿（Happy End）：\n  全收集路线，不能发SOS，不能触发虫干会彩蛋。\n  但有一个额外条件——日期必须在2216年11月3日或之后，输入「我回来了」。\n  毕竟，有些约定需要等到那一天才能兑现。\n\n• 想要空花阳焰（Open End）：\n  这个很刁钻。你需要「读过所有文件」但「没发给他看过」。\n  也就是自己偷偷看完，然后发SOS求救，再输入「我该走了」。\n  ……对的对的，对吗？\n\n• 想要一莲托生（True End）：\n  全收集路线。所有文件反应都要触发，真名要识破，定位要同意，\n  虫干会的彩蛋要触发，失踪检察官邮件要读过，收到笑面青江的回复邮件，且不能发SOS。\n  然后随便输入什么，那个人会自己走向你。毕竟，他和你都等了太久太久了。\n\n• 电量归零会触发「如是观」，然后强制重启。\n  这不是坏结局，这是「你挂机太久被系统踢下线了」。\n\n━━━━━━━━━━━━━━━━━━━━━━\n\n好了，小抄给完了。\n求你当作没看到，慢慢玩，好吗？\n我写了那么多隐藏台词，你速通的话它们就永远沉睡了……\n\nP.S. 如果还是死档了，设置里有初始化。再死一次的话……\n那就再看一遍这封邮件吧，反正它不会消失的（苦笑）。\n\n——某个一边测bug一边祈祷不要速通的开发者" };
+    const GUIDE_MAIL_2 = { sender: "???", subject: "小抄（不要告诉别人）", body: "真是拿你没办法。既然你又来求救了。那我就写小抄给你。\n此系统没有阅后即焚的效果。\n所以如果看到了，记住了，就当这封信不存在好吗？\n求求你了，我磨了这么久才做出来的。\n被人速通了，我不白设计了嘛......\n\n━━━━━━━━━━━━━━━━━━━━━━\n【小抄·时间跳转篇】\n━━━━━━━━━━━━━━━━━━━━━━\n\n日历右上角那个⚙️按钮，点进去可以跳时间。\n年份低于2000会报错，不要试了，我没做内容（诚实）。\n\n几个关键日期记得去：\n• 2024-01-19 到 2026-11-03 之间 → 文件里会多出一篇日记\n• 2213-07-13 到 2214-01-18 之间 → 健康诊断书解锁\n• 2225-07-03 之后 → 有一份档案等着你\n• 2205-01-14 → 会多出一个聊天对象哦\n• 2023-01-05 → 有我的彩蛋（喂）\n\n还有，2214-01-18 这个日子很特殊。\n去文件里看看「独白」在那天是不是能正常显示了？\n\n━━━━━━━━━━━━━━━━━━━━━━\n【小抄·聊天篇】\n━━━━━━━━━━━━━━━━━━━━━━\n\n给J-0108发邮件就能解锁聊天，记得同意定位！\n不同意也能玩，但会少很多剧情，而且跳转20次以上会迷路……\n  对了，「迷路」的前提是定位授权关闭。如果你同意定位了，就不会触发迷途。\n\n和他聊天时多发点东西：\n• 照片（去相机里拍，不同日期能拍到不一样的）\n• 文件（解锁后在文件应用里，点+号就能发）\n\n每发一个文件他都会说点什么，这些都是「收集要素」！\n要触发好结局的话，日记、诊断书、档案都要发给他看一遍。\n\n━━━━━━━━━━━━━━━━━━━━━━\n【小抄·关键词篇】\n━━━━━━━━━━━━━━━━━━━━━━\n\nJ-0108有45组关键词回复，多试试不同的词。\n但更重要的是——跳转时间超过5次之后，试着输入「数珠丸恒次」。\n对，就是他的真名。他会吓一跳的（笑）。\n\n━━━━━━━━━━━━━━━━━━━━━━\n【小抄·结局篇】\n━━━━━━━━━━━━━━━━━━━━━━\n\n8个结局，触发条件我懒得全写了，但给你几个提示：\n\n• 想要Happy End / True End：不要发SOS！不要发SOS！不要发SOS！\n  重要的事说三遍。发求救邮件会关闭很多路线。\n\n• 想要垂慈摄受（Good End）：\n  多发文件，多跳转，识破真名，同意定位，然后输入「我喜欢你」。\n  对，就是要这样！\n\n• 想要酬愿（Happy End）：\n  全收集路线，不能发SOS，不能触发虫干会彩蛋。\n  但有一个额外条件——日期必须在2216年11月3日或之后，输入「我回来了」。\n  毕竟，有些约定需要等到那一天才能兑现。\n\n• 想要空花阳焰（Open End）：\n  这个很刁钻。你需要「读过所有文件」但「没发给他看过」。\n  也就是自己偷偷看完，然后发SOS求救，再输入「我该走了」。\n  ……对的对的，对吗？\n\n• 想要一莲托生（True End）：\n  全收集路线。所有文件反应都要触发，真名要识破，定位要同意，\n  虫干会的彩蛋要触发，失踪检察官邮件要读过，收到笑面青江的回复邮件，且不能发SOS。\n  然后随便输入什么，那个人会自己走向你。毕竟，他和你都等了太久太久了。\n\n• 电量归零会触发「如是观」，然后强制重启。\n  这不是坏结局，这是「你挂机太久被系统踢下线了」。\n\n━━━━━━━━━━━━━━━━━━━━━━\n\n好了，小抄给完了。\n求你当作没看到，慢慢玩，好吗？\n我写了那么多隐藏台词，你速通的话它们就永远沉睡了……\n\nP.S. 如果还是死档了，设置里有初始化。再死一次的话……\n那就再看一遍这封邮件吧，反正它不会消失的（苦笑）。\n\n——某个一边测bug一边祈祷不要速通的开发者" };
+    const FINAL_TIP_MAIL = { sender: "???", subject: "最后的提示", body: "去看看文件里面是不是出现了什么。\n这真的是最后的提示了，没有更多了。\n对了，需要输入密码！\n是数珠丸名字的罗马音。" };
+    const GUIDE_CONTENT = `https://shirakaya.github.io/ukiyo/docs/`;
 
     const EASTER_EGG_MAIL = { sender: "未知", subject: "客串事件", body: "问过某刃的意见，让我加上这一段，纪念一下本人和他的相遇。\n2023年1月5日，本人在本丸第一次和名为数珠丸恒次的存在相遇。\n但其实根本不知道该说些什么。问他要不要我在这封信里写告白算了。\n他说不要，就此罢休。\n请把这当成单纯的彩蛋(｡- .•)\n有想过要不要按自己本丸的时间来设计路线。\n最后还是选择了讲诉一点幻想夜话。\n有些日期精心设计了，有些日期是随机乱打的，不必深究。\n如果有bug，请见谅。\n死档了，可以点击设置内的初始化可以重头来过。\n对，没有存档点……\n代码太复杂了，我的大纲一变再变已经约等于没有大纲了。\n希望不要有酒吧点炒饭事件，我真的不想修bug(Ｔ▽Ｔ)" };
 
@@ -310,6 +311,7 @@
         tip: TIP_MAIL,
         guide_1: GUIDE_MAIL_1,
         guide_2: GUIDE_MAIL_2,
+        final_tip: FINAL_TIP_MAIL,
         credit: CREDIT_MAIL,
         emaill: EMAILL_MAIL,
         emaill2: EMAILL_MAIL_2,
@@ -476,6 +478,8 @@
         emaillFifteenthMailShown: false,
         emaillSixteenthMailShown: false,
         emaillReplyReceived: false,
+        guideUnlocked: false,
+        finalTipMailShown: false,
         triggeredAttachmentReplies: {
             bg1: false, bg3: false, bg4: false,
             diary: false, healthReport: false,
@@ -1468,10 +1472,22 @@
         }
     }
 
-    function refreshMemo() {
+        function refreshMemo() {
         const c = dom.memoContent; 
         if (!c) return;
         let html = '';
+        if (state.finalTipMailShown && !state.guideUnlocked) {
+            html += `<div style="padding:16px; text-align:center; background:rgba(255,255,255,0.3); backdrop-filter:blur(5px); border-radius:16px; margin-bottom:12px;">
+                <div style="font-size:13px; color:#4b3b6e; margin-bottom:10px; font-weight:600;">需要密码才能查看隐藏文件</div>
+                <div style="display:flex; justify-content:center; gap:8px; align-items:center;">
+                    <input type="text" id="guidePassword" placeholder="输入密码" style="border-radius:20px; border:1px solid rgba(0,0,0,0.1); padding:8px 14px; background:rgba(255,255,255,0.7); width:140px; text-align:center; font-size:13px; outline:none; color:#333;">
+                    <button id="guideUnlockBtn" style="background:#c3b7f0; border:none; border-radius:20px; padding:8px 18px; color:white; font-size:13px; cursor:pointer; font-weight:600;">解锁</button>
+                </div>
+                <div id="guideError" style="color:#ff6b6b; font-size:12px; margin-top:8px; display:none; font-weight:500;">密码错误</div>
+            </div>`;
+        } else if (state.guideUnlocked) {
+            html += `<div class="file-item" style="cursor:pointer;"><div class="file-item-title">📄 <a href="${GUIDE_CONTENT}" target="_blank" style="color:#4b3b6e; text-decoration:none; font-weight:600;">游玩手册</a></div><div class="file-item-content" style="font-size:12px; color:#888; padding-top:4px;">点击在新标签页打开</div></div>`;
+        }
         if (isFileUnlocked('diary')) {
             setFlag('aboutThatDayShown');
             html += `<div class="file-item" data-read-id="diary"><div class="file-item-title">📄 关于那一天.txt</div><div class="file-item-content">${escapeHtml(FILE_CONTENT)}</div></div>`;
@@ -1496,6 +1512,21 @@
             if (readId === 'monologue' && setFlag('readMonologue')) requestSave();
             if (item.id === 'archiveFileItem' && setFlag('archiveRead')) requestSave();
         }));
+        const guideBtn = document.getElementById('guideUnlockBtn');
+        const guideInput = document.getElementById('guidePassword');
+        if (guideBtn && guideInput) {
+            guideBtn.addEventListener('click', () => {
+                if (guideInput.value.trim().toLowerCase() === 'juzumaru') {
+                    state.guideUnlocked = true;
+                    requestSave();
+                    refreshMemo();
+                } else {
+                    const err = document.getElementById('guideError');
+                    if (err) { err.style.display = 'block'; err.textContent = '密码错误'; }
+                }
+            });
+            guideInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') guideBtn.click(); });
+        }
     }
 
     function generateGarbledTitle() {
@@ -1542,6 +1573,7 @@
         if (state.tipMailShown) displayMails.push({ id: 'tip', data: TIP_MAIL });
         if (state.tipMailCount >= 2) displayMails.push({ id: 'guide_1', data: GUIDE_MAIL_1 });
         if (state.tipMailCount >= 3) displayMails.push({ id: 'guide_2', data: GUIDE_MAIL_2 });
+        if (state.finalTipMailShown) displayMails.push({ id: 'final_tip', data: FINAL_TIP_MAIL });
         if (state.emaillSendMailShown) displayMails.push({ id: 'emaill', data: EMAILL_MAIL });
         if (state.emaillSecondMailShown) displayMails.push({ id: 'emaill2', data: EMAILL_MAIL_2 });
         if (state.emaillThirdMailShown) displayMails.push({ id: 'emaill3', data: EMAILL_MAIL_3 });
@@ -1684,8 +1716,11 @@
                 if (!state.tipMailShown) { state.tipMailShown = true; }
             } else if (state.tipMailCount === 2) {
                 showNotification('收到新邮件：抄作业是不对的');
-            } else if (state.tipMailCount >= 3) {
+            } else if (state.tipMailCount === 3) {
                 showNotification('收到新邮件：小抄（不要告诉别人）');
+            } else if (state.tipMailCount >= 4 && !state.finalTipMailShown) {
+                state.finalTipMailShown = true;
+                showNotification('收到新邮件：最后的提示');
             }
         }
         showToast('已发送');
